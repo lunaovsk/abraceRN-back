@@ -37,8 +37,9 @@ public class ItemService {
         }
 
         RegisterItems item = new RegisterItems(dto);
-        item.setSize(dto.size().toUpperCase());
-
+        if (item.getSize() != null) {
+            item.setSize(dto.size().toUpperCase());
+        }
         return itemRepository.save(item);
     }
 
