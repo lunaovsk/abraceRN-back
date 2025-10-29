@@ -53,6 +53,9 @@ public class ItemService {
     public Integer totalOfItem () {
         var total = itemRepository.getQuantity();
         var quantity = new TotalDTO(total).total();
+        if (quantity == null) {
+            return 0;
+        }
         return quantity;
     }
 
