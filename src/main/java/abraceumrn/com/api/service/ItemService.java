@@ -8,6 +8,9 @@ import abraceumrn.com.api.domain.repository.ItemRepository;
 
 import org.springframework.stereotype.Service;
 
+import javax.swing.*;
+import java.util.List;
+
 
 @Service
 public class ItemService {
@@ -43,10 +46,18 @@ public class ItemService {
         return itemRepository.save(item);
     }
 
+    public List<RegisterItems> listAll(){
+        return itemRepository.findAll();
+    }
+
     public Integer totalOfItem () {
         var total = itemRepository.getQuantity();
         var quantity = new TotalDTO(total).total();
         return quantity;
+    }
+
+    public void deleteItem(Long id) {
+        itemRepository.deleteById(id);
     }
 }
 

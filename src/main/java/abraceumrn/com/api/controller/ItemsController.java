@@ -26,10 +26,22 @@ public class ItemsController {
         return ResponseEntity.status(HttpStatus.CREATED).build();
 
     }
+
     @GetMapping
+    public ResponseEntity listAll () {
+        return ResponseEntity.ok(itemService.listAll());
+    }
+
+    @GetMapping("/total")
     public ResponseEntity totalItem () {
         var total = itemService.totalOfItem();
         var item = new TotalDTO(total);
         return ResponseEntity.ok(item);
+    }
+
+    @DeleteMapping("/deletar/{id}")
+    public ResponseEntity deleteItem (@PathVariable Long id) {
+        itemService.deleteItem(id);
+        return ResponseEntity.ok().build();
     }
 }
