@@ -14,4 +14,5 @@ public record ItemDTO(
         @NotNull int quantity,
         Gender gender,
         LocalDate expirationAt
-) {}
+) {
+}

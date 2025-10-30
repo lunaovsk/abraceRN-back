@@ -2,6 +2,7 @@ package abraceumrn.com.api.service;
 
 import abraceumrn.com.api.domain.dto.TotalDTO;
 import abraceumrn.com.api.domain.dto.ViewItems;
+import abraceumrn.com.api.domain.enumItem.Gender;
 import abraceumrn.com.api.domain.enumItem.ItemType;
 import abraceumrn.com.api.domain.items.ItemDTO;
 import abraceumrn.com.api.domain.items.RegisterItems;
@@ -50,7 +51,16 @@ public class ItemService {
     }
 
 
-    public Page<ViewItems> listItems (Pageable pageable) {
+    public Page<ViewItems> listItems(ItemType type, String itemName, String itemSize, Gender gender, Pageable pageable) {
+        if (type != null && itemName != null && itemSize != null && gender != null) {
+            return itemRepository.findByTypeAndItemNameAndSizeAndGender(type, itemName, itemSize, gender, pageable);
+        } else if (type != null && itemName != null && itemSize != null) {
+            return itemRepository.findByTypeAndItemNameAndSize(type, itemName, itemSize, pageable);
+        } else if (type != null && itemName != null) {
+            return itemRepository.findByTypeAndItemName(type, itemName, pageable);
+        } else if (type != null) {
+            return itemRepository.findByType(type, pageable);
+        }
         return itemRepository.findAll(pageable).map(ViewItems::new);
     }
 

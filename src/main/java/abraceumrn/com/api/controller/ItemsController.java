@@ -3,6 +3,8 @@ package abraceumrn.com.api.controller;
 
 import abraceumrn.com.api.domain.dto.TotalDTO;
 import abraceumrn.com.api.domain.dto.ViewItems;
+import abraceumrn.com.api.domain.enumItem.Gender;
+import abraceumrn.com.api.domain.enumItem.ItemType;
 import abraceumrn.com.api.domain.items.ItemDTO;
 import abraceumrn.com.api.service.ItemService;
 import jakarta.transaction.Transactional;
@@ -30,11 +32,15 @@ public class ItemsController {
 
     }
 
-
     @GetMapping("/all-items")
-    public ResponseEntity<Page<ViewItems>> getAllItems (Pageable pageable) {
-        return ResponseEntity.ok(itemService.listItems(pageable));
+    public ResponseEntity<Page<ViewItems>> getAllItems (@RequestParam(required = false) ItemType type,
+                                                        @RequestParam(required = false) String itemName,
+                                                        @RequestParam(required = false) String itemSize,
+                                                        @RequestParam(required = false) Gender gender,
+                                                        Pageable pageable) {
 
+        Page<ViewItems> items = itemService.listItems(type, itemName, itemSize, gender, pageable);
+        return ResponseEntity.ok(items);
     }
 
     @GetMapping("/total")

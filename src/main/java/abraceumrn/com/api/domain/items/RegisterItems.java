@@ -34,7 +34,6 @@ public class RegisterItems {
         this.createdAt = LocalDate.now();
         this.expirationAt = dto.expirationAt();
         this.gender = dto.gender();
-
     }
 
     public Long getId() {
