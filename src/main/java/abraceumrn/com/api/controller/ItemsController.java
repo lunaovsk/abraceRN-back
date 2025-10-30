@@ -50,8 +50,16 @@ public class ItemsController {
     }
 
     @DeleteMapping("/deletar/{id}")
+    @Transactional
     public ResponseEntity deleteItem (@PathVariable Long id) {
         itemService.deleteItem(id);
+        return ResponseEntity.ok().build();
+    }
+
+    @PutMapping("/atualizar/{id}")
+    @Transactional
+    public ResponseEntity putItem (@PathVariable Long id, @RequestBody @Valid ItemDTO itemDTO) {
+        itemService.updateItemId(id, itemDTO);
         return ResponseEntity.ok().build();
     }
 }

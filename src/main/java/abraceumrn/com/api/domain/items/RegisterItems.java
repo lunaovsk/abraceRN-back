@@ -6,6 +6,8 @@ import jakarta.persistence.*;
 
 import java.time.LocalDate;
 
+import static abraceumrn.com.api.domain.enumItem.ItemType.*;
+
 @Table(name = "item")
 @Entity
 public class RegisterItems {
@@ -99,4 +101,47 @@ public class RegisterItems {
     public void setExpirationAt(LocalDate expirationAt) {
         this.expirationAt = expirationAt;
     }
+
+    public void updateItem (ItemDTO itemDTO) {
+        this.gender = null;
+        this.size = null;
+        this.expirationAt = null;
+        this.createdAt = LocalDate.now();
+        switch (itemDTO.type()) {
+
+            case ROUPA -> {
+                if (itemDTO.itemName() != null && itemDTO.gender() != null && itemDTO.size() != null && itemDTO.quantity() > 0) {
+                    this.type = itemDTO.type();
+                    this.itemName = itemDTO.itemName();
+                    this.gender = itemDTO.gender();
+                    this.size = itemDTO.size().toUpperCase();
+                    this.quantity = itemDTO.quantity();
+                }
+            }
+
+            case ACESSORIO -> {
+                if (itemDTO.itemName() != null && itemDTO.quantity() > 0) {
+                    this.type = itemDTO.type();
+                    this.itemName = itemDTO.itemName();
+                    this.quantity = itemDTO.quantity();
+                    this.size = itemDTO.size();
+                    this.expirationAt = itemDTO.expirationAt();
+                }
+            }
+
+            case HIGIENE, ALIMENTACAO -> {
+                if (itemDTO.itemName() != null && itemDTO.quantity() > 0) {
+                    this.type = itemDTO.type();
+                    this.itemName = itemDTO.itemName();
+                    this.quantity = itemDTO.quantity();
+                    this.expirationAt = itemDTO.expirationAt();
+                }
+            }
+
+            default -> this.type = INDEFINIDO;
+        }
+        
+
+    }
+
 }

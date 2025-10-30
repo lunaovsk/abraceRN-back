@@ -8,9 +8,11 @@ import abraceumrn.com.api.domain.items.ItemDTO;
 import abraceumrn.com.api.domain.items.RegisterItems;
 import abraceumrn.com.api.domain.repository.ItemRepository;
 
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.swing.*;
 import java.util.List;
@@ -75,6 +77,13 @@ public class ItemService {
 
     public void deleteItem(Long id) {
         itemRepository.deleteById(id);
+    }
+
+    public void updateItemId (Long id, ItemDTO itemDTO) {
+        var i = itemRepository.findById(id);
+        RegisterItems items = i.get();
+        items.updateItem(itemDTO);
+        itemRepository.save(items);
     }
 }
 
