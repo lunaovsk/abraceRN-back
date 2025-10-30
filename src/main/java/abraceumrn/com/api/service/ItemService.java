@@ -51,10 +51,8 @@ public class ItemService {
     }
 
 
-    public Page<ViewItems> listItems(ItemType type, String itemName, String itemSize, Gender gender, Pageable pageable) {
-        if (type != null && itemName != null && itemSize != null && gender != null) {
-            return itemRepository.findByTypeAndItemNameAndSizeAndGender(type, itemName, itemSize, gender, pageable);
-        } else if (type != null && itemName != null && itemSize != null) {
+    public Page<ViewItems> listItems(ItemType type, String itemName, String itemSize, Pageable pageable) {
+        if (type != null && itemName != null && itemSize != null) {
             return itemRepository.findByTypeAndItemNameAndSize(type, itemName, itemSize, pageable);
         } else if (type != null && itemName != null) {
             return itemRepository.findByTypeAndItemName(type, itemName, pageable);

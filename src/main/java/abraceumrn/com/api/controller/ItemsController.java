@@ -36,10 +36,9 @@ public class ItemsController {
     public ResponseEntity<Page<ViewItems>> getAllItems (@RequestParam(required = false) ItemType type,
                                                         @RequestParam(required = false) String itemName,
                                                         @RequestParam(required = false) String itemSize,
-                                                        @RequestParam(required = false) Gender gender,
                                                         Pageable pageable) {
 
-        Page<ViewItems> items = itemService.listItems(type, itemName, itemSize, gender, pageable);
+        Page<ViewItems> items = itemService.listItems(type, itemName, itemSize, pageable);
         return ResponseEntity.ok(items);
     }
 

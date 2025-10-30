@@ -18,7 +18,6 @@ public interface ItemRepository extends JpaRepository<RegisterItems, Long> {
     Page<ViewItems> findByItemName (String itemName, Pageable pageable);
     Page<ViewItems> findByTypeAndItemName (ItemType itemType, String itemName, Pageable pageable);
     Page<ViewItems> findByTypeAndItemNameAndSize (ItemType itemType, String itemName, String itemSize, Pageable pageable);
-    Page<ViewItems> findByTypeAndItemNameAndSizeAndGender (ItemType itemType, String itemName, String itemSize, Gender gender, Pageable pageable);
 
 
 
