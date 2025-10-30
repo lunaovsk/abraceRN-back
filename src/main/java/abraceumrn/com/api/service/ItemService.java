@@ -1,11 +1,14 @@
 package abraceumrn.com.api.service;
 
 import abraceumrn.com.api.domain.dto.TotalDTO;
+import abraceumrn.com.api.domain.dto.ViewItems;
 import abraceumrn.com.api.domain.enumItem.ItemType;
 import abraceumrn.com.api.domain.items.ItemDTO;
 import abraceumrn.com.api.domain.items.RegisterItems;
 import abraceumrn.com.api.domain.repository.ItemRepository;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import javax.swing.*;
@@ -46,9 +49,12 @@ public class ItemService {
         return itemRepository.save(item);
     }
 
-    public List<RegisterItems> listAll(){
-        return itemRepository.findAll();
+
+    public Page<ViewItems> listItems (Pageable pageable) {
+        return itemRepository.findAll(pageable).map(ViewItems::new);
     }
+
+
 
     public Integer totalOfItem () {
         var total = itemRepository.getQuantity();

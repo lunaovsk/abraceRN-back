@@ -2,11 +2,14 @@ package abraceumrn.com.api.controller;
 
 
 import abraceumrn.com.api.domain.dto.TotalDTO;
+import abraceumrn.com.api.domain.dto.ViewItems;
 import abraceumrn.com.api.domain.items.ItemDTO;
 import abraceumrn.com.api.service.ItemService;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -27,9 +30,11 @@ public class ItemsController {
 
     }
 
-    @GetMapping
-    public ResponseEntity listAll () {
-        return ResponseEntity.ok(itemService.listAll());
+
+    @GetMapping("/all-items")
+    public ResponseEntity<Page<ViewItems>> getAllItems (Pageable pageable) {
+        return ResponseEntity.ok(itemService.listItems(pageable));
+
     }
 
     @GetMapping("/total")
