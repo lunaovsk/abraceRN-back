@@ -124,7 +124,7 @@ public class RegisterItems {
                     this.type = itemDTO.type();
                     this.itemName = itemDTO.itemName();
                     this.quantity = itemDTO.quantity();
-                    this.size = itemDTO.size();
+                    this.size = itemDTO.size().toUpperCase();
                     this.expirationAt = itemDTO.expirationAt();
                 }
             }
@@ -134,6 +134,7 @@ public class RegisterItems {
                     this.type = itemDTO.type();
                     this.itemName = itemDTO.itemName();
                     this.quantity = itemDTO.quantity();
+                    this.size = itemDTO.size().toUpperCase();
                     this.expirationAt = itemDTO.expirationAt();
                 }
             }
