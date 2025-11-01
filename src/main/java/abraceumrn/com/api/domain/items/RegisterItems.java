@@ -119,7 +119,7 @@ public class RegisterItems {
                 }
             }
 
-            case ACESSORIO -> {
+            case ACESSORIO, HIGIENE -> {
                 if (itemDTO.itemName() != null && itemDTO.quantity() > 0) {
                     this.type = itemDTO.type();
                     this.itemName = itemDTO.itemName();
@@ -129,12 +129,11 @@ public class RegisterItems {
                 }
             }
 
-            case HIGIENE, ALIMENTACAO -> {
+            case ALIMENTACAO -> {
                 if (itemDTO.itemName() != null && itemDTO.quantity() > 0) {
                     this.type = itemDTO.type();
                     this.itemName = itemDTO.itemName();
                     this.quantity = itemDTO.quantity();
-                    this.size = itemDTO.size().toUpperCase();
                     this.expirationAt = itemDTO.expirationAt();
                 }
             }
