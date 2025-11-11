@@ -1,0 +1,18 @@
+# Arquivos compilados do Java
+target/
+*.class
+
+# Logs
+*.log
+
+# Arquivos do Eclipse
+.project
+.classpath
+.settings/
+
+# Arquivos do Maven
+.mvn/
+
+# Arquivos de IDE (genérico)
+.idea/
+*.iml
