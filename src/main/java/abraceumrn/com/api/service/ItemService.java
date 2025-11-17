@@ -61,6 +61,7 @@ public class ItemService {
         } else if (type != null) {
             return itemRepository.findByType(type, pageable);
         }
+        System.out.println(itemRepository.findAll(pageable).map(ViewItems::new));
         return itemRepository.findAll(pageable).map(ViewItems::new);
     }
 
