@@ -1,0 +1,147 @@
+package abraceumrn.com.api.domain.items;
+
+import abraceumrn.com.api.domain.enumItem.Gender;
+import abraceumrn.com.api.domain.enumItem.ItemType;
+import jakarta.persistence.*;
+
+import java.time.LocalDate;
+
+import static abraceumrn.com.api.domain.enumItem.ItemType.*;
+
+@Table(name = "item")
+@Entity
+public class RegisterItems {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    private String itemName;
+    @Enumerated(EnumType.STRING)
+    private ItemType type;
+    private String size;
+    @Enumerated(EnumType.STRING)
+    private Gender gender;
+    private int quantity;
+    private LocalDate createdAt;
+    private LocalDate expirationAt;
+
+    public RegisterItems() {
+
+    }
+    public RegisterItems(ItemDTO dto) {
+        this.itemName = dto.itemName();
+        this.type = dto.type();
+        this.size = dto.size();
+        this.quantity = dto.quantity();
+        this.createdAt = LocalDate.now();
+        this.expirationAt = dto.expirationAt();
+        this.gender = dto.gender();
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getItemName() {
+        return itemName;
+    }
+
+    public void setItemName(String itemName) {
+        this.itemName = itemName;
+    }
+
+    public ItemType getType() {
+        return type;
+    }
+
+    public void setType(ItemType type) {
+        this.type = type;
+    }
+
+    public String getSize() {
+        return size;
+    }
+
+    public void setSize(String size) {
+        this.size = size;
+    }
+
+    public Gender getGender() {
+        return gender;
+    }
+
+    public void setGender(Gender gender) {
+        this.gender = gender;
+    }
+
+    public int getQuantity() {
+        return quantity;
+    }
+
+    public void setQuantity(int quantity) {
+        this.quantity = quantity;
+    }
+
+    public LocalDate getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDate createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public LocalDate getExpirationAt() {
+        return expirationAt;
+    }
+
+    public void setExpirationAt(LocalDate expirationAt) {
+        this.expirationAt = expirationAt;
+    }
+
+    public void updateItem (ItemDTO itemDTO) {
+        this.gender = null;
+        this.size = null;
+        this.expirationAt = null;
+        this.createdAt = LocalDate.now();
+        switch (itemDTO.type()) {
+
+            case ROUPA -> {
+                if (itemDTO.itemName() != null && itemDTO.gender() != null && itemDTO.size() != null && itemDTO.quantity() > 0) {
+                    this.type = itemDTO.type();
+                    this.itemName = itemDTO.itemName();
+                    this.gender = itemDTO.gender();
+                    this.size = itemDTO.size().toUpperCase();
+                    this.quantity = itemDTO.quantity();
+                }
+            }
+
+            case ACESSORIO, HIGIENE -> {
+                if (itemDTO.itemName() != null && itemDTO.quantity() > 0) {
+                    this.type = itemDTO.type();
+                    this.itemName = itemDTO.itemName();
+                    this.quantity = itemDTO.quantity();
+                    this.size = itemDTO.size().toUpperCase();
+                    this.expirationAt = itemDTO.expirationAt();
+                }
+            }
+
+            case ALIMENTACAO -> {
+                if (itemDTO.itemName() != null && itemDTO.quantity() > 0) {
+                    this.type = itemDTO.type();
+                    this.itemName = itemDTO.itemName();
+                    this.quantity = itemDTO.quantity();
+                    this.expirationAt = itemDTO.expirationAt();
+                }
+            }
+
+            default -> this.type = INDEFINIDO;
+        }
+        
+
+    }
+
+}
