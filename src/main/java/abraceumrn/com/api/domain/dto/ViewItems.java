@@ -2,8 +2,9 @@ package abraceumrn.com.api.domain.dto;
 
 import abraceumrn.com.api.domain.enumItem.Gender;
 import abraceumrn.com.api.domain.enumItem.ItemType;
-import abraceumrn.com.api.domain.items.RegisterItems;
+import abraceumrn.com.api.domain.items.Item;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 public record ViewItems(
         Long id,
@@ -11,13 +12,20 @@ public record ViewItems(
         ItemType type,
         String size,
         Gender gender,
-        LocalDate createdAt,
+        LocalDateTime createdAt,
         LocalDate expirationAt,
         Integer quantity
-
 ) {
-    public ViewItems (RegisterItems i) {
-        this(i.getId(), i.getItemName(), i.getType(), i.getSize(), i.getGender(), i.getCreatedAt(), i.getExpirationAt(), i.getQuantity());
+    public ViewItems(Item item) {
+        this(
+            item.getId(),
+            item.getItemName(),
+            item.getCategory(),
+            item.getSize(),
+            item.getGender(),
+            item.getCreate_at(),
+            item.getExpiration_at(),
+            item.getQuantity()
+        );
     }
-
 }

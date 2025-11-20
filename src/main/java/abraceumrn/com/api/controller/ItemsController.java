@@ -1,49 +1,62 @@
 package abraceumrn.com.api.controller;
 
-
 import abraceumrn.com.api.domain.dto.TotalDTO;
 import abraceumrn.com.api.domain.dto.ViewItems;
-import abraceumrn.com.api.domain.enumItem.Gender;
 import abraceumrn.com.api.domain.enumItem.ItemType;
+import abraceumrn.com.api.domain.items.Item;
 import abraceumrn.com.api.domain.items.ItemDTO;
 import abraceumrn.com.api.service.ItemService;
-import jakarta.transaction.Transactional;
-import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import jakarta.transaction.Transactional;
+import jakarta.validation.Valid;
+import java.util.List;
 
 @RestController
 @RequestMapping("/dashboard")
+@CrossOrigin(origins = "*", allowedHeaders = "*")
 public class ItemsController {
 
     @Autowired
     private ItemService itemService;
 
-
     @PostMapping
     @Transactional
-    public ResponseEntity register (@RequestBody @Valid ItemDTO dto) {
+    public ResponseEntity register(@RequestBody @Valid ItemDTO dto) {
         itemService.registerItems(dto);
         return ResponseEntity.status(HttpStatus.CREATED).build();
-
     }
 
     @GetMapping("/all-items")
-    public ResponseEntity<Page<ViewItems>> getAllItems (@RequestParam(required = false) ItemType type,
-                                                        @RequestParam(required = false) String itemName,
-                                                        @RequestParam(required = false) String itemSize,
-                                                        Pageable pageable) {
+    public ResponseEntity<Page<ViewItems>> getAllItems(
+            @RequestParam(required = false) ItemType type,
+            @RequestParam(required = false) String itemName,
+            @RequestParam(required = false) String itemSize,
+            @RequestParam(required = false) String itemType,
+            Pageable pageable) {
+        
+        Page<Item> itemsPage = itemService.listItems(type, itemName, itemSize, itemType, pageable);
+        Page<ViewItems> itemsView = itemsPage.map(ViewItems::new);
+        
+        return ResponseEntity.ok(itemsView);
+    }
 
-        Page<ViewItems> items = itemService.listItems(type, itemName, itemSize, pageable);
-        return ResponseEntity.ok(items);
+    @GetMapping("/types-by-category")
+    public ResponseEntity<List<String>> getTypesByCategory(@RequestParam ItemType category) {
+        return ResponseEntity.ok(itemService.getTypesByCategory(category));
+    }
+
+    @GetMapping("/all-types")
+    public ResponseEntity<List<String>> getAllTypes() {
+        return ResponseEntity.ok(itemService.getAllItemNames());
     }
 
     @GetMapping("/total")
-    public ResponseEntity totalItem () {
+    public ResponseEntity totalItem() {
         var total = itemService.totalOfItem();
         var item = new TotalDTO(total);
         return ResponseEntity.ok(item);
@@ -51,14 +64,14 @@ public class ItemsController {
 
     @DeleteMapping("/deletar/{id}")
     @Transactional
-    public ResponseEntity deleteItem (@PathVariable Long id) {
+    public ResponseEntity deleteItem(@PathVariable Long id) {
         itemService.deleteItem(id);
         return ResponseEntity.ok().build();
     }
 
     @PutMapping("/atualizar/{id}")
     @Transactional
-    public ResponseEntity putItem (@PathVariable Long id, @RequestBody @Valid ItemDTO itemDTO) {
+    public ResponseEntity putItem(@PathVariable Long id, @RequestBody @Valid ItemDTO itemDTO) {
         itemService.updateItemId(id, itemDTO);
         return ResponseEntity.ok().build();
     }
