@@ -101,46 +101,4 @@ public class RegisterItems {
         this.expirationAt = expirationAt;
     }
 
-    public void updateItem (ItemDTO itemDTO) {
-        this.gender = null;
-        this.size = null;
-        this.expirationAt = null;
-        this.createdAt = LocalDate.now();
-        switch (itemDTO.type()) {
-
-            case ROUPA -> {
-                if (itemDTO.itemName() != null && itemDTO.gender() != null && itemDTO.size() != null && itemDTO.quantity() >= 0) {
-                    this.type = itemDTO.type();
-                    this.itemName = itemDTO.itemName();
-                    this.gender = itemDTO.gender();
-                    this.size = itemDTO.size().toUpperCase();
-                    this.quantity = itemDTO.quantity();
-                }
-            }
-
-            case ACESSORIO, HIGIENE -> {
-                if (itemDTO.itemName() != null && itemDTO.quantity() >= 0) {
-                    this.type = itemDTO.type();
-                    this.itemName = itemDTO.itemName();
-                    this.quantity = itemDTO.quantity();
-                    this.size = itemDTO.size().toUpperCase();
-                    this.expirationAt = itemDTO.expirationAt();
-                }
-            }
-
-            case ALIMENTACAO -> {
-                if (itemDTO.itemName() != null && itemDTO.quantity() >= 0) {
-                    this.type = itemDTO.type();
-                    this.itemName = itemDTO.itemName();
-                    this.quantity = itemDTO.quantity();
-                    this.expirationAt = itemDTO.expirationAt();
-                }
-            }
-
-            default -> this.type = INDEFINIDO;
-        }
-        
-
-    }
-
 }
