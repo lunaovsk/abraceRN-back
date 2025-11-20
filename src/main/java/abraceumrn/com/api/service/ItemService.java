@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.swing.*;
+import java.time.LocalDate;
 import java.util.List;
 
 
@@ -26,11 +27,9 @@ public class ItemService {
 
     public ItemService(ItemRepository itemRepository) {
         this.itemRepository = itemRepository;
-
     }
 
     public RegisterItems registerItems(ItemDTO dto) {
-
         if (dto.type() == ItemType.ROUPA) {
             if (dto.size() == null || dto.gender() == null) {
                 throw new IllegalArgumentException("Roupas precisam de tamanho e gênero.");
@@ -45,13 +44,33 @@ public class ItemService {
             throw new IllegalArgumentException("Quantidade não pode ser menor ou igual a 0");
         }
 
+        if (dto.type() == ItemType.HIGIENE || dto.type() == ItemType.ALIMENTACAO) {
+            RegisterItems itemExistentExpirantion = itemRepository.findByTypeAndItemNameAndExpirationAt(
+                    dto.type(), dto.itemName(), dto.expirationAt());
+
+            if (itemExistentExpirantion != null) {
+                itemExistentExpirantion.setQuantity(itemExistentExpirantion.getQuantity() + dto.quantity());
+                itemExistentExpirantion.setCreatedAt(LocalDate.now());
+                return itemRepository.save(itemExistentExpirantion);
+            }
+        }
+        else {
+            RegisterItems itemExistent = itemRepository.findByTypeAndItemNameAndSizeAndGender(
+                    dto.type(), dto.itemName(), dto.size(), dto.gender());
+
+            if (itemExistent != null) {
+                itemExistent.setQuantity(itemExistent.getQuantity() + dto.quantity());
+                itemExistent.setCreatedAt(LocalDate.now());
+                return itemRepository.save(itemExistent);
+            }
+        }
+
         RegisterItems item = new RegisterItems(dto);
         if (item.getSize() != null) {
             item.setSize(dto.size().toUpperCase());
         }
         return itemRepository.save(item);
     }
-
 
     public Page<ViewItems> listItems(ItemType type, String itemName, String itemSize, Pageable pageable) {
         if (type != null && itemName != null && itemSize != null) {
@@ -64,8 +83,6 @@ public class ItemService {
         System.out.println(itemRepository.findAll(pageable).map(ViewItems::new));
         return itemRepository.findAll(pageable).map(ViewItems::new);
     }
-
-
 
     public Integer totalOfItem () {
         var total = itemRepository.getQuantity();

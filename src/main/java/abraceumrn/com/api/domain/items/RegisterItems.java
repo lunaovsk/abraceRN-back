@@ -26,7 +26,6 @@ public class RegisterItems {
     private LocalDate expirationAt;
 
     public RegisterItems() {
-
     }
     public RegisterItems(ItemDTO dto) {
         this.itemName = dto.itemName();
@@ -110,7 +109,7 @@ public class RegisterItems {
         switch (itemDTO.type()) {
 
             case ROUPA -> {
-                if (itemDTO.itemName() != null && itemDTO.gender() != null && itemDTO.size() != null && itemDTO.quantity() > 0) {
+                if (itemDTO.itemName() != null && itemDTO.gender() != null && itemDTO.size() != null && itemDTO.quantity() >= 0) {
                     this.type = itemDTO.type();
                     this.itemName = itemDTO.itemName();
                     this.gender = itemDTO.gender();
@@ -120,7 +119,7 @@ public class RegisterItems {
             }
 
             case ACESSORIO, HIGIENE -> {
-                if (itemDTO.itemName() != null && itemDTO.quantity() > 0) {
+                if (itemDTO.itemName() != null && itemDTO.quantity() >= 0) {
                     this.type = itemDTO.type();
                     this.itemName = itemDTO.itemName();
                     this.quantity = itemDTO.quantity();
@@ -130,7 +129,7 @@ public class RegisterItems {
             }
 
             case ALIMENTACAO -> {
-                if (itemDTO.itemName() != null && itemDTO.quantity() > 0) {
+                if (itemDTO.itemName() != null && itemDTO.quantity() >= 0) {
                     this.type = itemDTO.type();
                     this.itemName = itemDTO.itemName();
                     this.quantity = itemDTO.quantity();
