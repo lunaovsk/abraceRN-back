@@ -37,8 +37,8 @@ public class ItemService {
                 throw new IllegalArgumentException("Hygiene and food items must contain expiration date.");
             }
         }
-        if (dto.quantity() <= 0) {
-            throw new IllegalArgumentException("Quantity must be greater than 0.");
+        if (dto.quantity() < 0) {
+            throw new IllegalArgumentException("Quantity must be greater than 0 or 0.");
         }
     }
 
@@ -46,6 +46,9 @@ public class ItemService {
     // registrar item
     public RegisterItems registerItems(ItemDTO dto) {
         validateItemDTO(dto);
+        if (dto.quantity() <=0) {
+            throw new IllegalArgumentException("Quantity must be greater than 0.");
+        }
         RegisterItems existing = findExistingItem(dto);
         if (existing != null) {
             existing.setQuantity(existing.getQuantity() + dto.quantity());
