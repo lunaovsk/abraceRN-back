@@ -1,11 +1,9 @@
 package abraceumrn.com.api.domain.dto;
 
-import abraceumrn.com.api.domain.items.RegisterItems;
-
 public record TotalDTO(
-        Integer total
+        Integer total,
+        Integer totalType,
+        Integer totalTypeDistinct,
+        Integer totalUnique
 ) {
-    public TotalDTO (RegisterItems i) {
-        this(i.getQuantity());
-    }
 }

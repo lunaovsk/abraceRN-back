@@ -44,8 +44,7 @@ public class ItemsController {
 
     @GetMapping("/total")
     public ResponseEntity totalItem () {
-        var total = itemService.totalOfItem();
-        var item = new TotalDTO(total);
+        var item = itemService.totalOfItem();
         return ResponseEntity.ok(item);
     }
 

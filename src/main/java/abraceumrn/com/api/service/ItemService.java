@@ -81,10 +81,16 @@ public class ItemService {
     }
 
     // Card total
-    public Integer totalOfItem() {
+    public TotalDTO totalOfItem() {
         Integer total = itemRepository.getQuantity();
-        Integer quantity = new TotalDTO(total).total();
-        return (quantity == null) ? 0 : quantity;
+        Integer totalTypes = itemRepository.getTotalTypes();
+        Integer totalTypesDistinct = itemRepository.getTotalTypesDistintic();
+        Integer totalUnique = itemRepository.getTotalUnique();
+        if (total == null) total = 0;
+        if (totalTypes == null) totalTypes = 0;
+        if (totalTypesDistinct == null) totalTypesDistinct = 0;
+        if (totalUnique == null) totalUnique = 0;
+        return new TotalDTO(total, totalTypes, totalTypesDistinct, totalUnique);
     }
 
     // Delete de item
