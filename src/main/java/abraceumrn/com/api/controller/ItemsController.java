@@ -33,14 +33,17 @@ public class ItemsController {
     }
 
     @GetMapping("/all-items")
-    public ResponseEntity<Page<ViewItems>> getAllItems (@RequestParam(required = false) ItemType type,
-                                                        @RequestParam(required = false) String itemName,
-                                                        @RequestParam(required = false) String itemSize,
-                                                        Pageable pageable) {
+    public ResponseEntity<Page<ViewItems>> getAllItems(
+            @RequestParam(required = false) String itemName,
+            @RequestParam(required = false) String itemSize,
+            @RequestParam(required = false) ItemType category,
+            @RequestParam(required = false) Gender gender,
+            Pageable pageable) {
 
-        Page<ViewItems> items = itemService.listItems(type, itemName, itemSize, pageable);
+        Page<ViewItems> items = itemService.listItems(itemName, itemSize, category,gender, pageable);
         return ResponseEntity.ok(items);
     }
+
 
     @GetMapping("/total")
     public ResponseEntity totalItem () {

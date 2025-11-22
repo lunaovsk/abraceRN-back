@@ -14,10 +14,17 @@ public record ViewItems(
         LocalDate createdAt,
         LocalDate expirationAt,
         Integer quantity
-
 ) {
-    public ViewItems (RegisterItems i) {
-        this(i.getId(), i.getItemName(), i.getType(), i.getSize(), i.getGender(), i.getCreatedAt(), i.getExpirationAt(), i.getQuantity());
+    public ViewItems(RegisterItems i) {
+        this(
+                i.getId(),
+                i.getItemName(),
+                i.getType(),
+                i.getSize(),
+                i.getGender(),
+                i.getCreatedAt(),
+                i.getExpirationAt(),
+                i.getQuantity()
+        );
     }
-
 }

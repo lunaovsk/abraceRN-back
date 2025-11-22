@@ -7,12 +7,16 @@ import abraceumrn.com.api.domain.enumItem.ItemType;
 import abraceumrn.com.api.domain.items.ItemDTO;
 import abraceumrn.com.api.domain.items.RegisterItems;
 import abraceumrn.com.api.domain.repository.ItemRepository;
+import abraceumrn.com.api.domain.repository.ViewItemsRepository;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import jakarta.persistence.criteria.Predicate;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 
@@ -20,9 +24,11 @@ import java.util.Objects;
 public class ItemService {
 
     private final ItemRepository itemRepository;
+    private final ViewItemsRepository viewItemsRepository;
 
-    public ItemService(ItemRepository itemRepository) {
+    public ItemService(ItemRepository itemRepository, ViewItemsRepository viewItemsRepository) {
         this.itemRepository = itemRepository;
+        this.viewItemsRepository = viewItemsRepository;
     }
 
     // validação
@@ -70,20 +76,36 @@ public class ItemService {
     }
 
     // Listagem total ou filtragem avançada
-    public Page<ViewItems> listItems(ItemType type, String itemName, String size, Pageable pageable) {
-        if (type != null && itemName != null && size != null) {
-            return itemRepository.findByTypeAndItemNameAndSize(type, itemName, size, pageable);
-        }
-        if (type != null && itemName != null) {
-            return itemRepository.findByTypeAndItemName(type, itemName, pageable);
-        }
-        if (type != null) {
-            return itemRepository.findByType(type, pageable);
-        }
-        return itemRepository.findAll(pageable).map(ViewItems::new);
+    public Page<ViewItems> listItems(String itemName, String itemSize, ItemType category, Gender gender, Pageable pageable) {
+        Page<RegisterItems> page = viewItemsRepository.findAll((root, query, cb) -> {
+
+            List<Predicate> predicates = new ArrayList<>();
+
+
+            if (category != null) {
+                predicates.add(cb.equal(root.get("type"), category));
+            }
+
+            if (itemName != null && !itemName.isEmpty()) {
+                predicates.add(cb.like(cb.lower(root.get("itemName")),
+                        "%" + itemName.toLowerCase() + "%"));
+            }
+
+            if(gender != null){
+                predicates.add(cb.equal(root.get("gender"),gender));
+            }
+
+            if (itemSize != null && !itemSize.isEmpty()) {
+                predicates.add(cb.equal(root.get("size"), itemSize));
+            }
+
+            return cb.and(predicates.toArray(new Predicate[0]));
+        }, pageable);
+        // ✅ aqui converte RegisterItems -> ViewItems
+         return page.map(registerItem -> new ViewItems(registerItem));
     }
 
-    // Card total
+        // Card total
     public TotalDTO totalOfItem() {
         Integer total = itemRepository.getQuantity();
         Integer totalTypes = itemRepository.getTotalTypes();
