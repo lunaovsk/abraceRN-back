@@ -16,7 +16,7 @@ famílias atendidas pela ONG.
     itens
 -   **Controle de Estoque**: Controle de quantidades e tipos de itens
 -   **Sistema de Kits**: Montagem automática de kits (enxoval e
-    higiene)\
+    higiene)
 -   **Cálculo Inteligente**: Verificação de disponibilidade e
     identificação de itens limitantes
 -   **Documentação Automática**: API documentada com Swagger/OpenAPI
