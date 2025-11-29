@@ -47,12 +47,6 @@ public class ErrorHandling {
                 .body(new ErrorResponse(ex.getMessage()));
     }
 
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<ErrorResponse> handleGenericException(Exception ex) {
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(new ErrorResponse("Erro interno do servidor"));
-    }
-
     // Records para respostas
     private record ErrorResponse(String error) {}
 
