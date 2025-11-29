@@ -13,12 +13,12 @@ famílias atendidas pela ONG.
 ### Funcionalidades Principais
 
 -   **Gestão de Itens**: Cadastro, listagem, atualização e exclusução de
-    itens\
--   **Controle de Estoque**: Controle de quantidades e tipos de itens\
+    itens
+-   **Controle de Estoque**: Controle de quantidades e tipos de itens
 -   **Sistema de Kits**: Montagem automática de kits (enxoval e
     higiene)\
 -   **Cálculo Inteligente**: Verificação de disponibilidade e
-    identificação de itens limitantes\
+    identificação de itens limitantes
 -   **Documentação Automática**: API documentada com Swagger/OpenAPI
 
 ## Arquitetura
@@ -35,9 +35,9 @@ famílias atendidas pela ONG.
 
 ### Padrões de Projeto
 
--   Strategy Pattern\
--   DTO Pattern\
--   Repository Pattern\
+-   Strategy Pattern
+-   DTO Pattern
+-   Repository Pattern
 -   Factory Pattern
 
 ## 📁 Estrutura do Projeto
@@ -58,15 +58,15 @@ dto/\
 
 ### Pré-requisitos
 
--   Java 21\
--   Maven 3.6+\
+-   Java 21
+-   Maven 3.6+
 -   MySQL 8.0+
 
 ### Configuração
 
-1.  Clone o repositório\
-2.  Configure o banco de dados\
-3.  Ajuste application.properties\
+1.  Clone o repositório
+2.  Configure o banco de dados
+3.  Ajuste application.properties
 4.  Execute `mvn spring-boot:run`
 
 ## Endpoints Principais
