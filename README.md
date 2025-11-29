@@ -12,7 +12,7 @@ famílias atendidas pela ONG.
 
 ### Funcionalidades Principais
 
--   **Gestão de Itens**: Cadastro, listagem, atualização e exclusução de
+-   **Gestão de Itens**: Cadastro, listagem, atualização e exclusão de
     itens
 -   **Controle de Estoque**: Controle de quantidades e tipos de itens
 -   **Sistema de Kits**: Montagem automática de kits (enxoval e
@@ -42,15 +42,19 @@ famílias atendidas pela ONG.
 
 ## 📁 Estrutura do Projeto
 
-src/main/java/abraceumrn/com/api/ ├── controller/\
-│ ├── ItemsController.java │ └── KitsController.java ├── domain/ │ ├──
-dto/\
+src/main/java/abraceumrn/com/api/ 
+├── controller/\
+│ ├── ItemsController.java 
+│ └── KitsController.java 
+├── domain/ 
+│ ├──dto/\
 │ ├── enumItem/\
 │ ├── items/\
 │ ├── repository/\
 │ └── strategy/\
 ├── service/\
-├── infra/ │ ├── exception/\
+├── infra/
+│ ├── exception/\
 │ └── security/\
 └── Application.java
 
@@ -58,16 +62,16 @@ dto/\
 
 ### Pré-requisitos
 
--   Java 21
--   Maven 3.6+
--   MySQL 8.0+
+- Java 21
+- Maven 3.6+
+- MySQL 8.0+
 
 ### Configuração
 
-1.  Clone o repositório
-2.  Configure o banco de dados
-3.  Ajuste application.properties
-4.  Execute `mvn spring-boot:run`
+1. Clone o repositório
+2. Configure o banco de dados
+3. Ajuste application.properties
+4. Execute `mvn spring-boot:run`
 
 ## Endpoints Principais
 
