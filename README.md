@@ -42,20 +42,20 @@ famílias atendidas pela ONG.
 
 ## 📁 Estrutura do Projeto
 ```
-src/main/java/abraceumrn/com/api/\
-├── controller/\
+src/main/java/abraceumrn/com/api/
+├── controller/
 │ ├── ItemsController.java\
 │ └── KitsController.java\
-├── domain/\ 
-│ ├──dto/\
-│ ├── enumItem/\
-│ ├── items/\
-│ ├── repository/\
-│ └── strategy/\
-├── service/\
-├── infra/\
-│ ├── exception/\
-│ └── security/\
+├── domain/
+│ ├──dto/
+│ ├── enumItem/
+│ ├── items/
+│ ├── repository/
+│ └── strategy/
+├── service/
+├── infra/
+│ ├── exception/
+│ └── security/
 └── Application.java
 ```
 ---
