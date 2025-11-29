@@ -41,7 +41,7 @@ famílias atendidas pela ONG.
 -   Factory Pattern
 
 ## 📁 Estrutura do Projeto
-
+```
 src/main/java/abraceumrn/com/api/\
 ├── controller/\
 │ ├── ItemsController.java\
@@ -57,6 +57,8 @@ src/main/java/abraceumrn/com/api/\
 │ ├── exception/\
 │ └── security/\
 └── Application.java
+```
+---
 
 ## Como Executar
 
