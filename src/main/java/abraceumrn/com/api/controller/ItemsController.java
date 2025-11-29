@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.*;
 
 @Tag(name = "Itens", description = "Endpoints para gerenciamento de itens no estoque")
 @RestController
-@RequestMapping("/items")
+@RequestMapping("/dashboard")
 public class ItemsController {
 
     @Autowired
