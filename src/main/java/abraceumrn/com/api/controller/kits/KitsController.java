@@ -1,4 +1,4 @@
-package abraceumrn.com.api.controller;
+package abraceumrn.com.api.controller.kits;
 
 
 import abraceumrn.com.api.domain.dto.KitResponseDTO;
