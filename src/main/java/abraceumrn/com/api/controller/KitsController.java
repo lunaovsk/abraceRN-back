@@ -3,7 +3,7 @@ package abraceumrn.com.api.controller;
 
 import abraceumrn.com.api.domain.dto.KitResponseDTO;
 import abraceumrn.com.api.domain.dto.RemoveKitDTO;
-import abraceumrn.com.api.service.ItemService;
+import abraceumrn.com.api.domain.items.ItemService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;

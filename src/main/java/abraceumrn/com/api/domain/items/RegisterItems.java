@@ -3,6 +3,10 @@ package abraceumrn.com.api.domain.items;
 import abraceumrn.com.api.domain.enumItem.Gender;
 import abraceumrn.com.api.domain.enumItem.ItemType;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.time.LocalDate;
 
@@ -10,6 +14,10 @@ import static abraceumrn.com.api.domain.enumItem.ItemType.*;
 
 @Table(name = "item")
 @Entity
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
 public class RegisterItems {
 
     @Id
@@ -25,8 +33,6 @@ public class RegisterItems {
     private LocalDate createdAt;
     private LocalDate expirationAt;
 
-    public RegisterItems() {
-    }
     public RegisterItems(ItemDTO dto) {
         this.itemName = dto.itemName();
         this.type = dto.type();
@@ -35,70 +41,6 @@ public class RegisterItems {
         this.createdAt = LocalDate.now();
         this.expirationAt = dto.expirationAt();
         this.gender = dto.gender();
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getItemName() {
-        return itemName;
-    }
-
-    public void setItemName(String itemName) {
-        this.itemName = itemName;
-    }
-
-    public ItemType getType() {
-        return type;
-    }
-
-    public void setType(ItemType type) {
-        this.type = type;
-    }
-
-    public String getSize() {
-        return size;
-    }
-
-    public void setSize(String size) {
-        this.size = size;
-    }
-
-    public Gender getGender() {
-        return gender;
-    }
-
-    public void setGender(Gender gender) {
-        this.gender = gender;
-    }
-
-    public int getQuantity() {
-        return quantity;
-    }
-
-    public void setQuantity(int quantity) {
-        this.quantity = quantity;
-    }
-
-    public LocalDate getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(LocalDate createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public LocalDate getExpirationAt() {
-        return expirationAt;
-    }
-
-    public void setExpirationAt(LocalDate expirationAt) {
-        this.expirationAt = expirationAt;
     }
 
 }
