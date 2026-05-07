@@ -40,7 +40,7 @@ famílias atendidas pela ONG.
 -   Repository Pattern
 -   Factory Pattern
 
-## 📁 Estrutura do Projeto
+## Estrutura do Projeto
 ```
 src/main/java/abraceumrn/com/api/
 ├── controller/

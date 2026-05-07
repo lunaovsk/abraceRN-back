@@ -1,11 +1,10 @@
-package abraceumrn.com.api.service;
+package abraceumrn.com.api.domain.items;
 
 import abraceumrn.com.api.domain.dto.*;
 import abraceumrn.com.api.domain.enumItem.Gender;
 import abraceumrn.com.api.domain.enumItem.ItemType;
 import abraceumrn.com.api.infra.exception.CustomException;
-import abraceumrn.com.api.domain.items.ItemDTO;
-import abraceumrn.com.api.domain.items.RegisterItems;
+import abraceumrn.com.api.domain.items.validation.ValidationItems;
 import abraceumrn.com.api.domain.repository.ItemRepository;
 import abraceumrn.com.api.domain.repository.ViewItemsRepository;
 import abraceumrn.com.api.domain.strategy.KitCalcular;
@@ -25,34 +24,29 @@ public class ItemService {
     private final ItemRepository itemRepository;
     private final ViewItemsRepository viewItemsRepository;
     private final KitFactory factory;
+    private final List<ValidationItems> validations;
 
     @Autowired
-    public ItemService(ItemRepository itemRepository, ViewItemsRepository viewItemsRepository, KitFactory factory) {
+    public ItemService(
+            ItemRepository itemRepository,
+            ViewItemsRepository viewItemsRepository,
+            KitFactory factory,
+            List<ValidationItems> validations
+    ) {
         this.itemRepository = itemRepository;
         this.viewItemsRepository = viewItemsRepository;
         this.factory = factory;
+        this.validations = validations;
     }
 
-    // Validação
-    private void validateItemDTO(ItemDTO dto) {
-        if (dto.type() == ItemType.ROUPA) {
-            if (dto.size() == null || dto.gender() == null) {
-                throw CustomException.validacao("Roupas devem conter tamanho e gênero.");
-            }
-        }
-        if (dto.type() == ItemType.HIGIENE || dto.type() == ItemType.ALIMENTACAO) {
-            if (dto.expirationAt() == null) {
-                throw CustomException.validacao("Itens de higiene e alimentação devem conter data de validade.");
-            }
-        }
-        if (dto.quantity() < 0) {
-            throw CustomException.validacao("Quantidade deve ser maior ou igual a 0.");
-        }
+    // Validação delegada às strategies
+    private void validate(ItemDTO dto) {
+        validations.forEach(v -> v.validation(dto));
     }
 
     // Registrar item
     public RegisterItems registerItems(ItemDTO dto) {
-        validateItemDTO(dto);
+        validate(dto);
         if (dto.quantity() <= 0) {
             throw CustomException.validacao("Quantidade deve ser maior que 0.");
         }
@@ -117,7 +111,7 @@ public class ItemService {
     public RegisterItems updateItemId(Long id, ItemDTO dto) {
         RegisterItems oldItem = itemRepository.findById(id)
                 .orElseThrow(() -> CustomException.itemNaoEncontrado("Item não encontrado"));
-        validateItemDTO(dto);
+        validate(dto);
 
         if (isSameItem(oldItem, dto)) {
             return updateQuantity(oldItem, dto.quantity());
