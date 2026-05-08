@@ -9,9 +9,11 @@ import abraceumrn.com.api.domain.items.ItemDTO;
 import abraceumrn.com.api.domain.items.ItemService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -22,6 +24,7 @@ import org.springframework.web.bind.annotation.*;
 @Tag(name = "Itens", description = "Endpoints para gerenciamento de itens no estoque")
 @RestController
 @RequestMapping("/dashboard")
+@SecurityRequirement(name = "bearer-key")
 public class ItemsController {
 
     @Autowired
@@ -47,7 +50,7 @@ public class ItemsController {
             @RequestParam(required = false) String itemSize,
             @RequestParam(required = false) ItemType category,
             @RequestParam(required = false) Gender gender,
-            Pageable pageable) {
+            @ParameterObject Pageable pageable) {
 
         Page<ViewItems> items = itemService.listItems(itemName, itemSize, category, gender, pageable);
         return ResponseEntity.ok(items);
@@ -62,7 +65,7 @@ public class ItemsController {
         return ResponseEntity.ok(item);
     }
 
-    @DeleteMapping("/deletar/{id}")
+    @DeleteMapping("admin/deletar/{id}")
     @Transactional
     @Operation(summary = "Deletar um item", description = "Remove um item do estoque pelo ID.")
     @ApiResponse(responseCode = "200", description = "Item deletado com sucesso")
@@ -72,7 +75,7 @@ public class ItemsController {
         itemService.deleteItem(id);
         return ResponseEntity.ok().build();
     }
-    @PutMapping("/atualizar/{id}")
+    @PutMapping("admin/atualizar/{id}")
     @Transactional
     @Operation(summary = "Atualizar um item do estoque", description = "Atualiza as informações de um item existente no estoque utilizando seu ID.")
     @ApiResponse(responseCode = "200", description = "Item atualizado com sucesso")

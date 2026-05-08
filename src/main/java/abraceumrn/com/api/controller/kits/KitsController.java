@@ -6,6 +6,7 @@ import abraceumrn.com.api.domain.dto.RemoveKitDTO;
 import abraceumrn.com.api.domain.items.ItemService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 @Tag(name = "Kits", description = "Endpoints para retirada de kits no estoque")
 @RestController
 @RequestMapping("/kit")
+@SecurityRequirement(name = "bearer-key")
 public class KitsController {
 
     @Autowired
