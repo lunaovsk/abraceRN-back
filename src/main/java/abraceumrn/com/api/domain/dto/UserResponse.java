@@ -1,4 +1,9 @@
 package abraceumrn.com.api.domain.dto;
 
-public record UserResponse() {
+import abraceumrn.com.api.domain.enumItem.Role;
+
+public record UserResponse(
+        String username,
+        Role role
+) {
 }
