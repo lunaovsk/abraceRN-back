@@ -1,7 +1,5 @@
 package abraceumrn.com.api.infra.security;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.oauth2.jwt.JwtClaimsSet;
@@ -27,7 +25,6 @@ public class TokenService {
     public Instant ExpirationToken () {
         return LocalDateTime.now().plusHours(1).toInstant(ZoneOffset.of("-03:00"));
     }
-
     public String generateToken(Authentication authentication) {
         ExpirationToken();
 
