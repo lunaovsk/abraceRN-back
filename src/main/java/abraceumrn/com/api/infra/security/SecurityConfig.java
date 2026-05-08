@@ -57,7 +57,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/login").permitAll()//Permite qualquer role em /login acessar o endereço.
                         .requestMatchers(HttpMethod.POST, "/login/create").permitAll()
                         .requestMatchers("/v3/api-docs/**", "/swagger-ui.html", "/swagger-ui/**").permitAll()
-                        .requestMatchers("/admin/**").hasAuthority("SCOPE_ROLE_ADMIN")
+                        .requestMatchers("/dashboard/admin/**").hasAuthority("SCOPE_ROLE_ADMIN")
                         .anyRequest().authenticated())
                 .oauth2ResourceServer( auth2 -> auth2.jwt(Customizer.withDefaults()));
         return httpSecurity.build();
