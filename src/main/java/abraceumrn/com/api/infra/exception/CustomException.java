@@ -1,5 +1,6 @@
 package abraceumrn.com.api.infra.exception;
 
+import java.util.Collections;
 import java.util.Map;
 
 public class CustomException extends RuntimeException {
@@ -21,16 +22,11 @@ public class CustomException extends RuntimeException {
     public CustomException(String message, String errorCode, Map<String, Object> details) {
         super(message);
         this.errorCode = errorCode;
-        this.details = details;
+        this.details = details != null ? Collections.unmodifiableMap(details) : null;
     }
 
-    public String getErrorCode() {
-        return errorCode;
-    }
-
-    public Map<String, Object> getDetails() {
-        return details;
-    }
+    public String getErrorCode() { return errorCode; }
+    public Map<String, Object> getDetails() { return details; }
 
     public static CustomException estoqueInsuficiente(String itemName, int disponivel, int necessario) {
         String message = String.format("Estoque insuficiente para %s. Disponível: %d, Necessário: %d",
@@ -40,6 +36,10 @@ public class CustomException extends RuntimeException {
 
     public static CustomException itemNaoEncontrado(String itemName) {
         return new CustomException("Item não encontrado: " + itemName, "ITEM_NAO_ENCONTRADO");
+    }
+
+    public static CustomException usuarioNaoEncontrado(String username) {
+        return new CustomException("Usuário não encontrado: " + username, "USUARIO_NAO_ENCONTRADO");
     }
 
     public static CustomException validacao(String message) {
