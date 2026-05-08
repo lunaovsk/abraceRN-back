@@ -3,13 +3,9 @@ package abraceumrn.com.api.infra.exception;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-
-import java.util.HashMap;
-import java.util.Map;
 
 @RestControllerAdvice
 public class ErrorHandling {
@@ -17,41 +13,38 @@ public class ErrorHandling {
     @ExceptionHandler(EntityNotFoundException.class)
     public ResponseEntity<ErrorResponse> handleEntityNotFound(EntityNotFoundException ex) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                .body(new ErrorResponse(ex.getMessage() != null ? ex.getMessage() : "Recurso não encontrado"));
+                .body(new ErrorResponse("ENTITY_NOT_FOUND", ex.getMessage() != null ? ex.getMessage() : "Recurso não encontrado", null));
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<?> error400(MethodArgumentNotValidException exception) {
-        var errors = exception.getFieldErrors();
-        return ResponseEntity.badRequest()
-                .body(errors.stream().map(DataErrorValidation::new).toList());
+    public ResponseEntity<ErrorResponse> handleValidation(MethodArgumentNotValidException ex) {
+        var errors = ex.getFieldErrors().stream()
+                .map(e -> new DataErrorValidation(e.getField(), e.getDefaultMessage()))
+                .toList();
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(new ErrorResponse("ERRO_VALIDACAO", "Erro de validação nos campos", errors));
     }
 
     @ExceptionHandler(CustomException.class)
-    public ResponseEntity<Map<String, Object>> handleCustomException(CustomException ex) {
-        Map<String, Object> response = new HashMap<>();
-        response.put("error", ex.getMessage());
-        response.put("errorCode", ex.getErrorCode());
-
-        if (ex.getDetails() != null) {
-            response.putAll(ex.getDetails());
-        }
-
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+    public ResponseEntity<ErrorResponse> handleCustomException(CustomException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(new ErrorResponse(ex.getErrorCode(), ex.getMessage(), ex.getDetails()));
     }
 
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<ErrorResponse> handleIllegalArgument(IllegalArgumentException ex) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body(new ErrorResponse(ex.getMessage()));
+                .body(new ErrorResponse("ILLEGAL_ARGUMENT", ex.getMessage(), null));
     }
 
-    // Records para respostas
-    private record ErrorResponse(String error) {}
-
-    private record DataErrorValidation(String campo, String mensagem) {
-        public DataErrorValidation(FieldError error) {
-            this(error.getField(), error.getDefaultMessage());
-        }
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ErrorResponse> handleGeneric(Exception ex) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(new ErrorResponse("INTERNAL_SERVER_ERROR", "Erro interno no servidor", null));
     }
+
+    private record ErrorResponse(String errorCode, String error, Object details) {}
+
+    private record DataErrorValidation(String campo, String mensagem) {}
 }
