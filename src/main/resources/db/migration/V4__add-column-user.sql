@@ -1,0 +1,2 @@
+ALTER TABLE user
+ADD role ENUM('USER','ADMIN');
