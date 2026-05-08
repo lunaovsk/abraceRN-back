@@ -1,6 +1,7 @@
 package abraceumrn.com.api.infra.security;
 
 import abraceumrn.com.api.domain.dto.UserDTO;
+import abraceumrn.com.api.domain.dto.UserRequestDTO;
 import abraceumrn.com.api.domain.enumItem.Role;
 import abraceumrn.com.api.domain.repository.UserRepository;
 import abraceumrn.com.api.domain.user.UserAuthenticated;
@@ -40,4 +41,5 @@ public class UserService implements UserDetailsService {
         UserData data = new UserData(emailLowerCase, passwordEnconded, Role.USER);
         return userRepository.save(data);
     }
+
 }
