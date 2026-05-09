@@ -2,7 +2,7 @@ package abraceumrn.com.api.domain.dto;
 
 import abraceumrn.com.api.domain.enumItem.Gender;
 import abraceumrn.com.api.domain.enumItem.ItemType;
-import abraceumrn.com.api.domain.items.RegisterItems;
+import abraceumrn.com.api.domain.items.Items;
 import java.time.LocalDate;
 
 public record ViewItems(
@@ -15,7 +15,7 @@ public record ViewItems(
         LocalDate expirationAt,
         Integer quantity
 ) {
-    public ViewItems(RegisterItems i) {
+    public ViewItems(Items i) {
         this(
                 i.getId(),
                 i.getItemName(),
