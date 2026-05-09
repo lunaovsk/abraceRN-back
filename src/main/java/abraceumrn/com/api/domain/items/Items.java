@@ -10,15 +10,13 @@ import lombok.Setter;
 
 import java.time.LocalDate;
 
-import static abraceumrn.com.api.domain.enumItem.ItemType.*;
-
 @Table(name = "item")
 @Entity
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class RegisterItems {
+public class Items {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -33,7 +31,7 @@ public class RegisterItems {
     private LocalDate createdAt;
     private LocalDate expirationAt;
 
-    public RegisterItems(ItemDTO dto) {
+    public Items(ItemDTO dto) {
         this.itemName = dto.itemName();
         this.type = dto.type();
         this.size = dto.size();

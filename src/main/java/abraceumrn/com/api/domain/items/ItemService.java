@@ -45,27 +45,27 @@ public class ItemService {
     }
 
     // Registrar item
-    public RegisterItems registerItems(ItemDTO dto) {
+    public Items registerItems(ItemDTO dto) {
         validate(dto);
         if (dto.quantity() <= 0) {
             throw CustomException.validacao("Quantidade deve ser maior que 0.");
         }
 
-        RegisterItems existing = findExistingItem(dto);
+        Items existing = findExistingItem(dto);
         if (existing != null) {
             existing.setQuantity(existing.getQuantity() + dto.quantity());
             existing.setCreatedAt(LocalDate.now());
             return itemRepository.save(existing);
         }
 
-        RegisterItems newItem = new RegisterItems(dto);
+        Items newItem = new Items(dto);
         if (newItem.getSize() != null) {
             newItem.setSize(dto.size().toUpperCase());
         }
         return itemRepository.save(newItem);
     }
 
-    private RegisterItems findExistingItem(ItemDTO dto) {
+    private Items findExistingItem(ItemDTO dto) {
         if (dto.type() == ItemType.HIGIENE || dto.type() == ItemType.ALIMENTACAO) {
             return itemRepository.findByTypeAndItemNameAndExpirationAt(dto.type(), dto.itemName(), dto.expirationAt());
         }
@@ -74,7 +74,7 @@ public class ItemService {
 
     // Listagem
     public Page<ViewItems> listItems(String itemName, String itemSize, ItemType category, Gender gender, Pageable pageable) {
-        Page<RegisterItems> page = viewItemsRepository.findAll((root, query, cb) -> {
+        Page<Items> page = viewItemsRepository.findAll((root, query, cb) -> {
             List<Predicate> predicates = new ArrayList<>();
 
             if (category != null) predicates.add(cb.equal(root.get("type"), category));
@@ -108,8 +108,8 @@ public class ItemService {
     }
 
     // Update de item
-    public RegisterItems updateItemId(Long id, ItemDTO dto) {
-        RegisterItems oldItem = itemRepository.findById(id)
+    public Items updateItemId(Long id, ItemDTO dto) {
+        Items oldItem = itemRepository.findById(id)
                 .orElseThrow(() -> CustomException.itemNaoEncontrado("Item não encontrado"));
         validate(dto);
 
@@ -119,7 +119,7 @@ public class ItemService {
         return replaceItem(oldItem, dto);
     }
 
-    private boolean isSameItem(RegisterItems item, ItemDTO dto) {
+    private boolean isSameItem(Items item, ItemDTO dto) {
         return item.getType().equals(dto.type()) &&
                 item.getItemName().equals(dto.itemName()) &&
                 Objects.equals(item.getSize(), dto.size()) &&
@@ -127,14 +127,14 @@ public class ItemService {
                 Objects.equals(item.getExpirationAt(), dto.expirationAt());
     }
 
-    private RegisterItems updateQuantity(RegisterItems item, int quantity) {
+    private Items updateQuantity(Items item, int quantity) {
         item.setQuantity(quantity);
         item.setCreatedAt(LocalDate.now());
         return itemRepository.save(item);
     }
 
-    private RegisterItems replaceItem(RegisterItems oldItem, ItemDTO dto) {
-        RegisterItems existing = findExistingItem(dto);
+    private Items replaceItem(Items oldItem, ItemDTO dto) {
+        Items existing = findExistingItem(dto);
         if (existing != null && !existing.getId().equals(oldItem.getId())) {
             existing.setQuantity(existing.getQuantity() + dto.quantity());
             existing.setCreatedAt(LocalDate.now());
@@ -142,7 +142,7 @@ public class ItemService {
             return itemRepository.save(existing);
         }
         itemRepository.delete(oldItem);
-        RegisterItems newItem = new RegisterItems(dto);
+        Items newItem = new Items(dto);
         if (newItem.getSize() != null) {
             newItem.setSize(dto.size().toUpperCase());
         }
@@ -158,7 +158,7 @@ public class ItemService {
         }
 
         for (KitDTO k : kit.items()) {
-            RegisterItems item = itemRepository.findByItemNameAndSizeAndGender(
+            Items item = itemRepository.findByItemNameAndSizeAndGender(
                     k.itemName(), k.size(), k.gender());
 
             if (item == null) {
