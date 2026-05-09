@@ -27,6 +27,7 @@ public class KitsController {
     @Operation(summary = "Calcular kits possíveis", description = "Calcula quantos kits podem ser formados com os itens disponíveis e indica quais itens são limitantes para formar um novo kit.")
     @ApiResponse(responseCode = "200", description = "Cálculo realizado com sucesso.")
     @ApiResponse(responseCode = "400", description = "Dados inválidos enviados para o cálculo.")
+    @ApiResponse(responseCode = "401", description = "Usuário não autenticado.")
     @ApiResponse(responseCode = "500", description = "Erro interno do servidor.")
     public ResponseEntity<KitResponseDTO> calculateKits(@RequestBody @Valid RemoveKitDTO kitDTO) {
         KitResponseDTO result = itemService.totalKit(kitDTO);
