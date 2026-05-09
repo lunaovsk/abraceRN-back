@@ -35,6 +35,7 @@ public class ItemsController {
     @Operation(summary = "Cadastrar um item no estoque", description = "Cria um novo item no estoque com as informações fornecidas.")
     @ApiResponse(responseCode = "201", description = "Item cadastrado com sucesso")
     @ApiResponse(responseCode = "400", description = "Dados inválidos para cadastro")
+    @ApiResponse(responseCode = "401", description = "Usuário não autenticado.")
     @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
     public ResponseEntity<Void> register(@RequestBody @Valid ItemDTO dto) {
         itemService.registerItems(dto);
@@ -44,6 +45,7 @@ public class ItemsController {
     @GetMapping("/all-items")
     @Operation(summary = "Listar itens", description = "Retorna uma lista paginada de itens filtrando por nome, tamanho, categoria ou gênero.")
     @ApiResponse(responseCode = "200", description = "Lista de itens retornada com sucesso")
+    @ApiResponse(responseCode = "401", description = "Usuário não autenticado.")
     @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
     public ResponseEntity<Page<ViewItems>> getAllItems(
             @RequestParam(required = false) String itemName,
@@ -53,12 +55,17 @@ public class ItemsController {
             @ParameterObject Pageable pageable) {
 
         Page<ViewItems> items = itemService.listItems(itemName, itemSize, category, gender, pageable);
+        if (items.stream().count() > 0) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+
+        }
         return ResponseEntity.ok(items);
     }
 
     @GetMapping("/total")
     @Operation(summary = "Obter o total de itens", description = "Retorna a quantidade total de itens cadastrados no estoque, a quantidade de itens únicos e tipos de itens cadastrados.")
     @ApiResponse(responseCode = "200", description = "Total retornado com sucesso")
+    @ApiResponse(responseCode = "401", description = "Usuário não autenticado.")
     @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
     public ResponseEntity<TotalDTO> totalItem() {
         var item = itemService.totalOfItem();
@@ -69,9 +76,10 @@ public class ItemsController {
     @Transactional
     @Operation(summary = "Deletar um item", description = "Remove um item do estoque pelo ID.")
     @ApiResponse(responseCode = "200", description = "Item deletado com sucesso")
+    @ApiResponse(responseCode = "401", description = "Usuário não autenticado.")
+    @ApiResponse(responseCode = "403", description = "Não possuí privilegios de 'Admin' para exclusão dos dados. Contate um administrador.")
     @ApiResponse(responseCode = "404", description = "Item não encontrado para exclusão")
     @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
-    @ApiResponse(responseCode = "401", description = "Não possuí privilegios de 'Admin' para exclusão dos dados. Contate um administrador.")
     public ResponseEntity<Void> deleteItem(@PathVariable Long id) {
         itemService.deleteItem(id);
         return ResponseEntity.ok().build();
@@ -80,10 +88,11 @@ public class ItemsController {
     @Transactional
     @Operation(summary = "Atualizar um item do estoque", description = "Atualiza as informações de um item existente no estoque utilizando seu ID.")
     @ApiResponse(responseCode = "200", description = "Item atualizado com sucesso")
+    @ApiResponse(responseCode = "401", description = "Usuário não autenticado.")
     @ApiResponse(responseCode = "400", description = "Dados inválidos para atualização")
+    @ApiResponse(responseCode = "403", description = "Não possuí privilegios de 'Admin' para exclusão dos dados. Contate um administrador.")
     @ApiResponse(responseCode = "404", description = "Item não encontrado")
     @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
-    @ApiResponse(responseCode = "401", description = "Não possuí privilegios de 'Admin' para exclusão dos dados. Contate um administrador.")
     public ResponseEntity<Void> updateItem(@PathVariable Long id, @RequestBody @Valid ItemDTO itemDTO) {
         itemService.updateItemId(id, itemDTO);
         return ResponseEntity.ok().build();
