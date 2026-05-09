@@ -17,7 +17,6 @@ public interface ItemRepository extends JpaRepository<RegisterItems, Long> {
     RegisterItems findByTypeAndItemNameAndSizeAndGender (ItemType itemType, String itemName, String itemSize, Gender gender);
     RegisterItems findByTypeAndItemNameAndExpirationAt (ItemType itemType, String itemName, LocalDate expiratedAt);
 
-
     @Query("SELECT COUNT(DISTINCT i.itemName) as totalTypes FROM RegisterItems i")
     Integer getTotalTypes();
 
