@@ -71,6 +71,7 @@ public class ItemsController {
     @ApiResponse(responseCode = "200", description = "Item deletado com sucesso")
     @ApiResponse(responseCode = "404", description = "Item não encontrado para exclusão")
     @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
+    @ApiResponse(responseCode = "401", description = "Não possuí privilegios de 'Admin' para exclusão dos dados. Contate um administrador.")
     public ResponseEntity<Void> deleteItem(@PathVariable Long id) {
         itemService.deleteItem(id);
         return ResponseEntity.ok().build();
@@ -82,6 +83,7 @@ public class ItemsController {
     @ApiResponse(responseCode = "400", description = "Dados inválidos para atualização")
     @ApiResponse(responseCode = "404", description = "Item não encontrado")
     @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
+    @ApiResponse(responseCode = "401", description = "Não possuí privilegios de 'Admin' para exclusão dos dados. Contate um administrador.")
     public ResponseEntity<Void> updateItem(@PathVariable Long id, @RequestBody @Valid ItemDTO itemDTO) {
         itemService.updateItemId(id, itemDTO);
         return ResponseEntity.ok().build();
