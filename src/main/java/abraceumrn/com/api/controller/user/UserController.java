@@ -7,6 +7,8 @@ import abraceumrn.com.api.domain.user.UserData;
 import abraceumrn.com.api.infra.security.TokenJWT;
 import abraceumrn.com.api.infra.security.TokenService;
 import abraceumrn.com.api.infra.security.UserService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +26,6 @@ import java.net.URI;
 
 @RestController
 @RequestMapping("/login")
-@SecurityRequirement(name = "bearer-key")
 public class UserController {
 
     @Autowired
@@ -36,12 +37,22 @@ public class UserController {
 
 
     @PostMapping("/create")
+    @Operation(summary = "Cadastrar nova conta.", description = "Cria um novo cadastro no gerenciamento do estoque com as informações fornecidas.")
+    @ApiResponse(responseCode = "201", description = "Conta cadastrada com sucesso!")
+    @ApiResponse(responseCode = "400", description = "Dados inválidos para cadastro!")
+    @ApiResponse(responseCode = "404", description = "E-mail ou senha inválidos!")
+    @ApiResponse(responseCode = "500", description = "Erro interno do servidor!")
     public ResponseEntity<UserResponse> create(@RequestBody @Valid UserDTO userDTO) {
         var account = userService.createAccount(userDTO);
         return ResponseEntity.status(HttpStatus.CREATED).body(new UserResponse(account.getUsername(), account.getRole()));
     }
 
     @PostMapping
+    @Operation(summary = "Login no dashboard.", description = "Realizar login como user ou admin dependendo do nível de acesso inserido no sistema.")
+    @ApiResponse(responseCode = "201", description = "Login efetuado com sucesso!")
+    @ApiResponse(responseCode = "400", description = "Dados inválidos para login!")
+    @ApiResponse(responseCode = "404", description = "E-mail ou senha inválidos!")
+    @ApiResponse(responseCode = "500", description = "Erro interno do servidor!")
     public ResponseEntity<TokenJWT> login(@RequestBody @Valid UserRequestDTO requestDTO) {
         var credentials = new UsernamePasswordAuthenticationToken(requestDTO.username(), requestDTO.password());
         var authenticated = manager.authenticate(credentials);
