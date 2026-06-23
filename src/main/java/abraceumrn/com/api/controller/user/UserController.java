@@ -14,6 +14,7 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -24,8 +25,15 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
 
+/**
+ * Controller para autenticação e criação de contas de usuário.
+ *
+ * Responsável por: registrar novos usuários e autenticar usuários existentes.
+ * Gera tokens JWT para autenticação em endpoints protegidos.
+ */
 @RestController
 @RequestMapping("/login")
+@PreAuthorize("isAuthenticated()")
 public class UserController {
 
     @Autowired
@@ -35,7 +43,12 @@ public class UserController {
     @Autowired
     private TokenService tokenService;
 
-
+    /**
+     * Cria uma nova conta de usuário no sistema.
+     *
+     * @param userDTO dados de registro do novo usuário
+     * @return resposta contendo username e role do usuário criado
+     */
     @PostMapping("/create")
     @Operation(summary = "Cadastrar nova conta.", description = "Cria um novo cadastro no gerenciamento do estoque com as informações fornecidas.")
     @ApiResponse(responseCode = "201", description = "Conta cadastrada com sucesso!")
@@ -47,7 +60,16 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.CREATED).body(new UserResponse(account.getUsername(), account.getRole()));
     }
 
+    /**
+     * Autentica um usuário e retorna um token JWT.
+     *
+     * O token gerado deve ser enviado no header Authorization de requisições posteriores.
+     *
+     * @param requestDTO credenciais do usuário (username e password)
+     * @return token JWT válido por 1 hora
+     */
     @PostMapping
+    @PreAuthorize("permitAll()")
     @Operation(summary = "Login no dashboard.", description = "Realizar login como user ou admin dependendo do nível de acesso inserido no sistema.")
     @ApiResponse(responseCode = "201", description = "Login efetuado com sucesso!")
     @ApiResponse(responseCode = "400", description = "Dados inválidos para login!")
