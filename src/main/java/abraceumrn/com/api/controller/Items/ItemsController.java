@@ -19,17 +19,34 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+/**
+ * Controller para gerenciamento de itens no estoque.
+ *
+ * Responsável por: criar, listar, atualizar e deletar itens.
+ * Todos os endpoints requerem autenticação JWT.
+ * Operações de delete e update requerem permissão de ADMIN.
+ */
 @Tag(name = "Itens", description = "Endpoints para gerenciamento de itens no estoque")
 @RestController
 @RequestMapping("/dashboard")
 @SecurityRequirement(name = "bearer-key")
+@PreAuthorize("isAuthenticated()")
 public class ItemsController {
 
     @Autowired
     private ItemService itemService;
 
+    /**
+     * Cadastra um novo item no estoque.
+     *
+     * Se um item com as mesmas características já existe, incrementa a quantidade.
+     *
+     * @param dto dados do item a ser cadastrado
+     * @return status 201 Created
+     */
     @PostMapping
     @Transactional
     @Operation(summary = "Cadastrar um item no estoque", description = "Cria um novo item no estoque com as informações fornecidas.")
@@ -42,6 +59,16 @@ public class ItemsController {
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
+    /**
+     * Lista todos os itens do estoque com filtros opcionais.
+     *
+     * @param itemName filtro por nome do item
+     * @param itemSize filtro por tamanho
+     * @param category filtro por categoria (tipo)
+     * @param gender filtro por gênero
+     * @param pageable informações de paginação
+     * @return página de itens encontrados
+     */
     @GetMapping("/all-items")
     @Operation(summary = "Listar itens", description = "Retorna uma lista paginada de itens filtrando por nome, tamanho, categoria ou gênero.")
     @ApiResponse(responseCode = "200", description = "Lista de itens retornada com sucesso")
@@ -55,13 +82,17 @@ public class ItemsController {
             @ParameterObject Pageable pageable) {
 
         Page<ViewItems> items = itemService.listItems(itemName, itemSize, category, gender, pageable);
-        if (items.stream().count() > 0) {
+        if (items.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-
         }
         return ResponseEntity.ok(items);
     }
 
+    /**
+     * Obtém estatísticas totais do estoque.
+     *
+     * @return DTO contendo total de itens, tipos distintos, etc.
+     */
     @GetMapping("/total")
     @Operation(summary = "Obter o total de itens", description = "Retorna a quantidade total de itens cadastrados no estoque, a quantidade de itens únicos e tipos de itens cadastrados.")
     @ApiResponse(responseCode = "200", description = "Total retornado com sucesso")
@@ -72,8 +103,17 @@ public class ItemsController {
         return ResponseEntity.ok(item);
     }
 
+    /**
+     * Deleta um item do estoque pelo ID.
+     *
+     * Requer permissão de ADMIN.
+     *
+     * @param id identificador do item a ser deletado
+     * @return status 200 OK
+     */
     @DeleteMapping("admin/deletar/{id}")
     @Transactional
+    @PreAuthorize("hasAuthority('SCOPE_ROLE_ADMIN')")
     @Operation(summary = "Deletar um item", description = "Remove um item do estoque pelo ID.")
     @ApiResponse(responseCode = "200", description = "Item deletado com sucesso")
     @ApiResponse(responseCode = "401", description = "Usuário não autenticado.")
@@ -84,8 +124,19 @@ public class ItemsController {
         itemService.deleteItem(id);
         return ResponseEntity.ok().build();
     }
+
+    /**
+     * Atualiza um item existente no estoque.
+     *
+     * Requer permissão de ADMIN.
+     *
+     * @param id identificador do item a ser atualizado
+     * @param itemDTO novos dados do item
+     * @return status 200 OK
+     */
     @PutMapping("admin/atualizar/{id}")
     @Transactional
+    @PreAuthorize("hasAuthority('SCOPE_ROLE_ADMIN')")
     @Operation(summary = "Atualizar um item do estoque", description = "Atualiza as informações de um item existente no estoque utilizando seu ID.")
     @ApiResponse(responseCode = "200", description = "Item atualizado com sucesso")
     @ApiResponse(responseCode = "401", description = "Usuário não autenticado.")

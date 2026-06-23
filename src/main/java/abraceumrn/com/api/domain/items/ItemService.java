@@ -18,6 +18,12 @@ import java.time.LocalDate;
 import jakarta.persistence.criteria.Predicate;
 import java.util.*;
 
+/**
+ * Service que encapsula a lógica de negócio para gerenciamento de itens.
+ *
+ * Responsável por: validar, criar, atualizar, deletar e listar itens do estoque.
+ * Também gerencia a criação de kits a partir dos itens disponíveis.
+ */
 @Service
 public class ItemService {
 
@@ -39,12 +45,26 @@ public class ItemService {
         this.validations = validations;
     }
 
-    // Validação delegada às strategies
+    /**
+     * Valida um DTO de item usando as estratégias de validação injetadas.
+     *
+     * @param dto dados a serem validados
+     * @throws CustomException se alguma validação falhar
+     */
     private void validate(ItemDTO dto) {
         validations.forEach(v -> v.validation(dto));
     }
 
-    // Registrar item
+    /**
+     * Registra um novo item no estoque.
+     *
+     * Se um item com as mesmas características já existe, incrementa a quantidade.
+     * Caso contrário, cria um novo registro.
+     *
+     * @param dto dados do item a ser registrado
+     * @return item persistido
+     * @throws CustomException se a quantidade for inválida ou validação falhar
+     */
     public Items registerItems(ItemDTO dto) {
         validate(dto);
         if (dto.quantity() <= 0) {
@@ -65,6 +85,15 @@ public class ItemService {
         return itemRepository.save(newItem);
     }
 
+    /**
+     * Busca um item existente no banco que match com os dados do DTO.
+     *
+     * Para itens com expiração (Higiene, Alimentação), busca por tipo, nome e data.
+     * Para outros itens, busca por tipo, nome, tamanho e gênero.
+     *
+     * @param dto dados do item a buscar
+     * @return item encontrado ou null se não existir
+     */
     private Items findExistingItem(ItemDTO dto) {
         if (dto.type() == ItemType.HIGIENE || dto.type() == ItemType.ALIMENTACAO) {
             return itemRepository.findByTypeAndItemNameAndExpirationAt(dto.type(), dto.itemName(), dto.expirationAt());
@@ -72,7 +101,18 @@ public class ItemService {
         return itemRepository.findByTypeAndItemNameAndSizeAndGender(dto.type(), dto.itemName(), dto.size(), dto.gender());
     }
 
-    // Listagem
+    /**
+     * Lista itens com filtros opcionais e paginação.
+     *
+     * Utiliza Criteria API para construir queries dinâmicas.
+     *
+     * @param itemName filtro por nome (case-insensitive)
+     * @param itemSize filtro por tamanho
+     * @param category filtro por categoria (tipo)
+     * @param gender filtro por gênero
+     * @param pageable informações de paginação
+     * @return página de itens encontrados
+     */
     public Page<ViewItems> listItems(String itemName, String itemSize, ItemType category, Gender gender, Pageable pageable) {
         Page<Items> page = viewItemsRepository.findAll((root, query, cb) -> {
             List<Predicate> predicates = new ArrayList<>();
@@ -89,7 +129,11 @@ public class ItemService {
         return page.map(ViewItems::new);
     }
 
-    // Card total
+    /**
+     * Obtém estatísticas totais do estoque.
+     *
+     * @return DTO com quantidade total, tipos únicos e itens únicos
+     */
     public TotalDTO totalOfItem() {
         Integer total = itemRepository.getQuantity() != null ? itemRepository.getQuantity() : 0;
         Integer totalTypes = itemRepository.getTotalTypes() != null ? itemRepository.getTotalTypes() : 0;
@@ -99,7 +143,12 @@ public class ItemService {
         return new TotalDTO(total, totalTypes, totalTypesDistinct, totalUnique);
     }
 
-    // Delete de item
+    /**
+     * Deleta um item do estoque.
+     *
+     * @param id identificador do item a deletar
+     * @throws CustomException se o item não existir
+     */
     public void deleteItem(Long id) {
         if (!itemRepository.existsById(id)) {
             throw CustomException.itemNaoEncontrado("ID " + id);
@@ -107,7 +156,17 @@ public class ItemService {
         itemRepository.deleteById(id);
     }
 
-    // Update de item
+    /**
+     * Atualiza um item existente.
+     *
+     * Se as características principais forem iguais, apenas a quantidade é atualizada.
+     * Caso contrário, substitui o item antigo por um novo.
+     *
+     * @param id identificador do item a atualizar
+     * @param dto novos dados do item
+     * @return item atualizado
+     * @throws CustomException se o item não existir ou validação falhar
+     */
     public Items updateItemId(Long id, ItemDTO dto) {
         Items oldItem = itemRepository.findById(id)
                 .orElseThrow(() -> CustomException.itemNaoEncontrado("Item não encontrado"));
@@ -119,6 +178,13 @@ public class ItemService {
         return replaceItem(oldItem, dto);
     }
 
+    /**
+     * Verifica se as características principais de dois itens são iguais.
+     *
+     * @param item item atual
+     * @param dto dados a comparar
+     * @return true se são o mesmo item
+     */
     private boolean isSameItem(Items item, ItemDTO dto) {
         return item.getType().equals(dto.type()) &&
                 item.getItemName().equals(dto.itemName()) &&
@@ -127,12 +193,29 @@ public class ItemService {
                 Objects.equals(item.getExpirationAt(), dto.expirationAt());
     }
 
+    /**
+     * Atualiza apenas a quantidade de um item.
+     *
+     * @param item item a atualizar
+     * @param quantity nova quantidade
+     * @return item persistido
+     */
     private Items updateQuantity(Items item, int quantity) {
         item.setQuantity(quantity);
         item.setCreatedAt(LocalDate.now());
         return itemRepository.save(item);
     }
 
+    /**
+     * Substitui um item antigo por um novo.
+     *
+     * Se um item com as mesmas características já existe, incrementa sua quantidade.
+     * Caso contrário, cria um novo item e deleta o antigo.
+     *
+     * @param oldItem item a ser substituído
+     * @param dto dados do novo item
+     * @return item persistido
+     */
     private Items replaceItem(Items oldItem, ItemDTO dto) {
         Items existing = findExistingItem(dto);
         if (existing != null && !existing.getId().equals(oldItem.getId())) {
@@ -149,7 +232,15 @@ public class ItemService {
         return itemRepository.save(newItem);
     }
 
-    // KITS
+    /**
+     * Cria um kit removendo itens do estoque.
+     *
+     * Valida se há quantidade suficiente de cada item no kit
+     * antes de realizar as deduções.
+     *
+     * @param kit dados do kit a ser criado com itens e quantidades
+     * @throws CustomException se não houver quantidade suficiente ou item não existir
+     */
     public void createdKit(RemoveKitDTO kit) {
         KitResponseDTO calculo = totalKit(kit);
 
@@ -178,7 +269,14 @@ public class ItemService {
         }
     }
 
-    // Cálculo de kits
+    /**
+     * Calcula a quantidade de kits possíveis com os itens disponíveis.
+     *
+     * Utiliza o padrão Strategy para delegar o cálculo conforme o tipo de kit.
+     *
+     * @param kit dados do kit com tipo e itens
+     * @return resposta com quantidade de kits possíveis e itens limitantes
+     */
     public KitResponseDTO totalKit(RemoveKitDTO kit) {
         KitCalcular strategy = factory.getCalculator(kit.type());
         return strategy.calcular(kit);

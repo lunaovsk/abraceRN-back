@@ -10,6 +10,12 @@ import lombok.Setter;
 
 import java.time.LocalDate;
 
+/**
+ * Entidade que representa um item no estoque.
+ *
+ * Armazena informações sobre um item incluindo nome, tipo, tamanho,
+ * gênero, quantidade disponível e datas de criação e expiração.
+ */
 @Table(name = "item")
 @Entity
 @Getter
@@ -31,6 +37,14 @@ public class Items {
     private LocalDate createdAt;
     private LocalDate expirationAt;
 
+    /**
+     * Construtor que cria um item a partir de um DTO.
+     *
+     * Inicializa o item com os dados fornecidos no DTO e define
+     * a data de criação como a data atual.
+     *
+     * @param dto dados do item a ser criado
+     */
     public Items(ItemDTO dto) {
         this.itemName = dto.itemName();
         this.type = dto.type();
