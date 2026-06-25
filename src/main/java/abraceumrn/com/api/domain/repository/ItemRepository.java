@@ -16,6 +16,7 @@ public interface ItemRepository extends JpaRepository<Items, Long> {
     Integer getQuantity();
     Items findByTypeAndItemNameAndSizeAndGender (ItemType itemType, String itemName, String itemSize, Gender gender);
     Items findByTypeAndItemNameAndExpirationAt (ItemType itemType, String itemName, LocalDate expiratedAt);
+    Items findByTypeAndItemNameAndSizeAndGenderAndExpirationAt (ItemType itemType, String itemName, String itemSize, Gender gender, LocalDate expiratedAt);
 
     @Query("SELECT COUNT(DISTINCT i.itemName) as totalTypes FROM Items  i")
     Integer getTotalTypes();
@@ -31,8 +32,8 @@ public interface ItemRepository extends JpaRepository<Items, Long> {
     @Query("SELECT COALESCE(SUM(i.quantity), 0) FROM Items  i WHERE " + "i.itemName = :itemName AND i.gender = :gender AND " + "(:size IS NULL AND i.size IS NULL OR i.size = :size)")
     Integer getTotalForItem(String itemName, String size, Gender gender);
 
-    @Query("SELECT COALESCE(SUM(i.quantity), 0) FROM Items  i WHERE " + "i.itemName = :itemName AND i.size = :size OR i.gender IS NULL")
-    Integer getTotalForItemWithoutSizeAndGender(String itemName, String size);
+    @Query("SELECT COALESCE(SUM(i.quantity), 0) FROM Items  i WHERE " + "i.itemName = :itemName AND i.gender IS NULL AND (i.size IS NULL OR i.size = '')")
+    Integer getTotalForItemWithoutSizeAndGender(String itemName);
 
 
 }

@@ -49,7 +49,7 @@ public class ErrorHandling {
 
     @ExceptionHandler(AccessDeniedException.class)
     public ResponseEntity<ErrorResponse> handleAccessDenied(AccessDeniedException ex) {
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+        return ResponseEntity.status(HttpStatus.FORBIDDEN)
                 .body(new ErrorResponse("UNAUTHORIZED", "Você não tem permissão de administrador para executar esta ação.", null));
     }
 

@@ -1,14 +1,15 @@
-package abraceumrn.com.api.domain.items;
+package abraceumrn.com.api.service;
 
 import abraceumrn.com.api.domain.dto.*;
 import abraceumrn.com.api.domain.enumItem.Gender;
 import abraceumrn.com.api.domain.enumItem.ItemType;
+import abraceumrn.com.api.domain.items.ItemDTO;
+import abraceumrn.com.api.domain.items.Items;
 import abraceumrn.com.api.infra.exception.CustomException;
+import abraceumrn.com.api.domain.items.strategy.ItemMatcherFactory;
 import abraceumrn.com.api.domain.items.validation.ValidationItems;
 import abraceumrn.com.api.domain.repository.ItemRepository;
 import abraceumrn.com.api.domain.repository.ViewItemsRepository;
-import abraceumrn.com.api.domain.strategy.KitCalcular;
-import abraceumrn.com.api.domain.strategy.KitFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -27,23 +28,14 @@ import java.util.*;
 @Service
 public class ItemService {
 
-    private final ItemRepository itemRepository;
-    private final ViewItemsRepository viewItemsRepository;
-    private final KitFactory factory;
-    private final List<ValidationItems> validations;
-
     @Autowired
-    public ItemService(
-            ItemRepository itemRepository,
-            ViewItemsRepository viewItemsRepository,
-            KitFactory factory,
-            List<ValidationItems> validations
-    ) {
-        this.itemRepository = itemRepository;
-        this.viewItemsRepository = viewItemsRepository;
-        this.factory = factory;
-        this.validations = validations;
-    }
+    private ItemRepository itemRepository;
+    @Autowired
+    private ViewItemsRepository viewItemsRepository;
+    @Autowired
+    private ItemMatcherFactory matcherFactory;
+    @Autowired
+    private List<ValidationItems> validations;
 
     /**
      * Valida um DTO de item usando as estratégias de validação injetadas.
@@ -67,9 +59,6 @@ public class ItemService {
      */
     public Items registerItems(ItemDTO dto) {
         validate(dto);
-        if (dto.quantity() <= 0) {
-            throw CustomException.validacao("Quantidade deve ser maior que 0.");
-        }
 
         Items existing = findExistingItem(dto);
         if (existing != null) {
@@ -88,17 +77,14 @@ public class ItemService {
     /**
      * Busca um item existente no banco que match com os dados do DTO.
      *
-     * Para itens com expiração (Higiene, Alimentação), busca por tipo, nome e data.
-     * Para outros itens, busca por tipo, nome, tamanho e gênero.
+     * Delega para o {@link ItemMatcherFactory}, que escolhe a estratégia de
+     * busca conforme o tipo do item (perecível x não perecível).
      *
      * @param dto dados do item a buscar
      * @return item encontrado ou null se não existir
      */
     private Items findExistingItem(ItemDTO dto) {
-        if (dto.type() == ItemType.HIGIENE || dto.type() == ItemType.ALIMENTACAO) {
-            return itemRepository.findByTypeAndItemNameAndExpirationAt(dto.type(), dto.itemName(), dto.expirationAt());
-        }
-        return itemRepository.findByTypeAndItemNameAndSizeAndGender(dto.type(), dto.itemName(), dto.size(), dto.gender());
+        return matcherFactory.getMatcher(dto.type()).findExisting(dto);
     }
 
     /**
@@ -172,25 +158,10 @@ public class ItemService {
                 .orElseThrow(() -> CustomException.itemNaoEncontrado("Item não encontrado"));
         validate(dto);
 
-        if (isSameItem(oldItem, dto)) {
+        if (matcherFactory.getMatcher(dto.type()).isSame(oldItem, dto)) {
             return updateQuantity(oldItem, dto.quantity());
         }
         return replaceItem(oldItem, dto);
-    }
-
-    /**
-     * Verifica se as características principais de dois itens são iguais.
-     *
-     * @param item item atual
-     * @param dto dados a comparar
-     * @return true se são o mesmo item
-     */
-    private boolean isSameItem(Items item, ItemDTO dto) {
-        return item.getType().equals(dto.type()) &&
-                item.getItemName().equals(dto.itemName()) &&
-                Objects.equals(item.getSize(), dto.size()) &&
-                Objects.equals(item.getGender(), dto.gender()) &&
-                Objects.equals(item.getExpirationAt(), dto.expirationAt());
     }
 
     /**
@@ -232,53 +203,4 @@ public class ItemService {
         return itemRepository.save(newItem);
     }
 
-    /**
-     * Cria um kit removendo itens do estoque.
-     *
-     * Valida se há quantidade suficiente de cada item no kit
-     * antes de realizar as deduções.
-     *
-     * @param kit dados do kit a ser criado com itens e quantidades
-     * @throws CustomException se não houver quantidade suficiente ou item não existir
-     */
-    public void createdKit(RemoveKitDTO kit) {
-        KitResponseDTO calculo = totalKit(kit);
-
-        if (calculo.kitsPossible() <= 0) {
-            throw CustomException.kitIncompleto(calculo.limitingItems());
-        }
-
-        for (KitDTO k : kit.items()) {
-            Items item = itemRepository.findByItemNameAndSizeAndGender(
-                    k.itemName(), k.size(), k.gender());
-
-            if (item == null) {
-                throw CustomException.itemNaoEncontrado(
-                        k.itemName() + " - Tamanho: " + k.size() + " - Gênero: " + k.gender()
-                );
-            }
-
-            if (item.getQuantity() < k.quantity()) {
-                throw CustomException.estoqueInsuficiente(
-                        k.itemName(), item.getQuantity(), k.quantity()
-                );
-            }
-
-            item.setQuantity(item.getQuantity() - k.quantity());
-            itemRepository.save(item);
-        }
-    }
-
-    /**
-     * Calcula a quantidade de kits possíveis com os itens disponíveis.
-     *
-     * Utiliza o padrão Strategy para delegar o cálculo conforme o tipo de kit.
-     *
-     * @param kit dados do kit com tipo e itens
-     * @return resposta com quantidade de kits possíveis e itens limitantes
-     */
-    public KitResponseDTO totalKit(RemoveKitDTO kit) {
-        KitCalcular strategy = factory.getCalculator(kit.type());
-        return strategy.calcular(kit);
-    }
 }

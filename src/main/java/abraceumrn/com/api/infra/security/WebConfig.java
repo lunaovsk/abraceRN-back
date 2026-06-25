@@ -1,8 +1,12 @@
 package abraceumrn.com.api.infra.security;
 
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.web.servlet.config.annotation.CorsRegistry;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+import java.util.List;
 
 /**
  * Configuração CORS (Cross-Origin Resource Sharing) da aplicação.
@@ -11,25 +15,35 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
  * Para produção, restringir as origins a apenas domínios confiáveis.
  */
 @Configuration
-public class WebConfig implements WebMvcConfigurer {
+public class WebConfig {
 
     /**
      * Configura as regras de CORS para todos os endpoints.
      *
      * Permite:
-     * - Origins: localhost:5500 (Live Server), localhost:3000 (React dev)
+     * - Origins: 127.0.0.1/localhost:5500 (Live Server), localhost:3000 (React dev)
      * - Métodos: GET, POST, PUT, DELETE, OPTIONS
-     * - Headers: todos
+     * - Headers: Authorization, Content-Type
      * - Credentials: cookies/auth headers
      *
-     * @param registry registry de CORS
+     * @return fonte de configuração CORS usada pelo Spring Security
      */
-    @Override
-    public void addCorsMappings(CorsRegistry registry) {
-        registry.addMapping("/**")
-                .allowedOrigins("http://127.0.0.1:5500", "http://localhost:3000")
-                .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
-                .allowedHeaders("*")
-                .allowCredentials(true);
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+
+        CorsConfiguration config = new CorsConfiguration();
+        config.setAllowedOrigins(List.of(
+                "http://127.0.0.1:5500",
+                "http://localhost:5500",
+                "http://localhost:3000",
+                "http://127.0.0.1:3000"
+        ));
+        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        config.setAllowedHeaders(List.of("Authorization", "Content-Type"));
+        config.setAllowCredentials(true);
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", config);
+        return source;
     }
 }

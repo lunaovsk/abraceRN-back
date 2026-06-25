@@ -1,4 +1,4 @@
-package abraceumrn.com.api.domain.strategy;
+package abraceumrn.com.api.domain.kit.strategy;
 
 import abraceumrn.com.api.domain.enumItem.KitType;
 import abraceumrn.com.api.infra.exception.CustomException;

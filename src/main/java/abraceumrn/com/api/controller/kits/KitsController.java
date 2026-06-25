@@ -3,7 +3,7 @@ package abraceumrn.com.api.controller.kits;
 
 import abraceumrn.com.api.domain.dto.KitResponseDTO;
 import abraceumrn.com.api.domain.dto.RemoveKitDTO;
-import abraceumrn.com.api.domain.items.ItemService;
+import abraceumrn.com.api.service.KitService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -30,7 +30,7 @@ import org.springframework.web.bind.annotation.*;
 public class KitsController {
 
     @Autowired
-    private ItemService itemService;
+    private KitService kitService;
 
     /**
      * Calcula quantos kits podem ser formados com os itens disponíveis.
@@ -48,7 +48,7 @@ public class KitsController {
     @ApiResponse(responseCode = "401", description = "Usuário não autenticado.")
     @ApiResponse(responseCode = "500", description = "Erro interno do servidor.")
     public ResponseEntity<KitResponseDTO> calculateKits(@RequestBody @Valid RemoveKitDTO kitDTO) {
-        KitResponseDTO result = itemService.totalKit(kitDTO);
+        KitResponseDTO result = kitService.totalKit(kitDTO);
         return ResponseEntity.ok(result);
     }
 
@@ -71,7 +71,7 @@ public class KitsController {
     @ApiResponse(responseCode = "404", description = "Algum dos itens informados não foi encontrado no estoque.")
     @ApiResponse(responseCode = "500", description = "Erro interno do servidor.")
     public ResponseEntity<Void> createKit(@RequestBody RemoveKitDTO kitDTO) {
-        itemService.createdKit(kitDTO);
+        kitService.createdKit(kitDTO);
         return ResponseEntity.ok().build();
     }
 }
