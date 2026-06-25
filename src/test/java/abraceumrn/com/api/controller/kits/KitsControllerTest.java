@@ -5,7 +5,7 @@ import abraceumrn.com.api.domain.dto.KitResponseDTO;
 import abraceumrn.com.api.domain.dto.RemoveKitDTO;
 import abraceumrn.com.api.domain.enumItem.Gender;
 import abraceumrn.com.api.domain.enumItem.KitType;
-import abraceumrn.com.api.domain.items.ItemService;
+import abraceumrn.com.api.service.KitService;
 import abraceumrn.com.api.infra.exception.CustomException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -40,7 +40,7 @@ class KitsControllerTest {
     private JacksonTester<RemoveKitDTO> removeKitDTOJacksonTester;
 
     @MockitoBean
-    private ItemService itemService;
+    private KitService kitService;
 
     @Test
     @WithMockUser
@@ -50,7 +50,7 @@ class KitsControllerTest {
                 new KitDTO("Body", Gender.M, "P", 2)
         ));
 
-        when(itemService.totalKit(any())).thenReturn(new KitResponseDTO(5, Map.of()));
+        when(kitService.totalKit(any())).thenReturn(new KitResponseDTO(5, Map.of()));
 
         var response = mvc.perform(post("/kit/calcular")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -68,7 +68,7 @@ class KitsControllerTest {
                 new KitDTO("Fralda", null, null, 3)
         ));
 
-        when(itemService.totalKit(any())).thenReturn(new KitResponseDTO(3, Map.of()));
+        when(kitService.totalKit(any())).thenReturn(new KitResponseDTO(3, Map.of()));
 
         var response = mvc.perform(post("/kit/calcular")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -83,7 +83,7 @@ class KitsControllerTest {
     @DisplayName("Deveria devolver 400 quando quantidade do item for inválida no cálculo")
     void calculateKitsQuantidadeInvalida() throws Exception {
         doThrow(CustomException.validacao("Quantidade por kit inválida para: Body"))
-                .when(itemService).totalKit(any());
+                .when(kitService).totalKit(any());
 
         var kit = new RemoveKitDTO(KitType.ENXOVAL, List.of(
                 new KitDTO("Body", Gender.M, "P", 0)
@@ -110,7 +110,7 @@ class KitsControllerTest {
     }
 
     @Test
-    @WithMockUser
+    @WithMockUser(authorities = "SCOPE_ROLE_ADMIN")
     @DisplayName("Deveria devolver 200 ao gerar kit de enxoval com sucesso")
     void createKitEnxoval() throws Exception {
         var kit = new RemoveKitDTO(KitType.ENXOVAL, List.of(
@@ -126,7 +126,7 @@ class KitsControllerTest {
     }
 
     @Test
-    @WithMockUser
+    @WithMockUser(authorities = "SCOPE_ROLE_ADMIN")
     @DisplayName("Deveria devolver 200 ao gerar kit de higiene com sucesso")
     void createKitHigiene() throws Exception {
         var kit = new RemoveKitDTO(KitType.HIGIENE, List.of(
@@ -142,11 +142,11 @@ class KitsControllerTest {
     }
 
     @Test
-    @WithMockUser
+    @WithMockUser(authorities = "SCOPE_ROLE_ADMIN")
     @DisplayName("Deveria devolver 400 quando kit estiver incompleto por falta de estoque")
     void createKitIncompleto() throws Exception {
         doThrow(CustomException.kitIncompleto(Map.of("Body", 2)))
-                .when(itemService).createdKit(any());
+                .when(kitService).createdKit(any());
 
         var kit = new RemoveKitDTO(KitType.ENXOVAL, List.of(
                 new KitDTO("Body", Gender.M, "P", 2)
@@ -161,11 +161,30 @@ class KitsControllerTest {
     }
 
     @Test
-    @WithMockUser
+    @WithMockUser(authorities = "SCOPE_ROLE_ADMIN")
     @DisplayName("Deveria devolver 404 quando item do kit não for encontrado")
     void createKitItemNaoEncontrado() throws Exception {
         doThrow(CustomException.itemNaoEncontrado("Body - Tamanho: P - Gênero: M"))
-                .when(itemService).createdKit(any());
+                .when(kitService).createdKit(any());
+
+        var kit = new RemoveKitDTO(KitType.ENXOVAL, List.of(
+                new KitDTO("Body", Gender.M, "P", 2)
+        ));
+
+        var response = mvc.perform(put("/kit/gerar-kits")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(removeKitDTOJacksonTester.write(kit).getJson()))
+                .andReturn().getResponse();
+
+        assertThat(response.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+    }
+
+    @Test
+    @WithMockUser(authorities = "SCOPE_ROLE_ADMIN")
+    @DisplayName("Deveria devolver 400 quando estoque for insuficiente para gerar kit")
+    void createKitEstoqueInsuficiente() throws Exception {
+        doThrow(CustomException.estoqueInsuficiente("Body", 1, 2))
+                .when(kitService).createdKit(any());
 
         var kit = new RemoveKitDTO(KitType.ENXOVAL, List.of(
                 new KitDTO("Body", Gender.M, "P", 2)
@@ -181,11 +200,8 @@ class KitsControllerTest {
 
     @Test
     @WithMockUser
-    @DisplayName("Deveria devolver 400 quando estoque for insuficiente para gerar kit")
-    void createKitEstoqueInsuficiente() throws Exception {
-        doThrow(CustomException.estoqueInsuficiente("Body", 1, 2))
-                .when(itemService).createdKit(any());
-
+    @DisplayName("Deveria negar geração de kit (401) quando usuário não for ADMIN")
+    void createKitSemPermissaoAdmin() throws Exception {
         var kit = new RemoveKitDTO(KitType.ENXOVAL, List.of(
                 new KitDTO("Body", Gender.M, "P", 2)
         ));
@@ -195,6 +211,6 @@ class KitsControllerTest {
                         .content(removeKitDTOJacksonTester.write(kit).getJson()))
                 .andReturn().getResponse();
 
-        assertThat(response.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(response.getStatus()).isEqualTo(HttpStatus.UNAUTHORIZED.value());
     }
 }

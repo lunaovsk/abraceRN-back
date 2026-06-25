@@ -1,9 +1,8 @@
-package abraceumrn.com.api.domain.strategy;
+package abraceumrn.com.api.domain.kit.strategy;
 
 import abraceumrn.com.api.domain.dto.KitDTO;
 import abraceumrn.com.api.domain.dto.KitResponseDTO;
 import abraceumrn.com.api.domain.dto.RemoveKitDTO;
-import abraceumrn.com.api.infra.exception.CustomException;
 import abraceumrn.com.api.domain.repository.ItemRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -17,14 +16,14 @@ public abstract class AbstractKitCalculator implements KitCalcular {
     protected ItemRepository itemRepository;
 
     @Override
-    public KitResponseDTO calcularKit(RemoveKitDTO kit) {
+    public KitResponseDTO calcular(RemoveKitDTO kit) {
         Map<String, Integer> kitsPorItem = new HashMap<>();
         Map<String, Integer> faltantes = new HashMap<>();
 
         for (KitDTO item : kit.items()) {
             Integer totalEstoque;
             if ((item.size() == null || item.size().isEmpty()) && item.gender() == null) {
-                totalEstoque = itemRepository.getTotalForItemWithoutSizeAndGender(item.itemName(), item.size());
+                totalEstoque = itemRepository.getTotalForItemWithoutSizeAndGender(item.itemName());
             } else {
                 totalEstoque = itemRepository.getTotalForItem(item.itemName(), item.size(), item.gender());
             }
@@ -32,10 +31,6 @@ public abstract class AbstractKitCalculator implements KitCalcular {
             if (totalEstoque == null) totalEstoque = 0;
 
             Integer quantidadePorKit = item.quantity();
-            if (quantidadePorKit <= 0) {
-                throw CustomException.validacao("Quantidade por kit inválida para: " + item.itemName());
-            }
-
             Integer kitsPossiveis = totalEstoque / quantidadePorKit;
             kitsPorItem.put(item.itemName(), kitsPossiveis);
 

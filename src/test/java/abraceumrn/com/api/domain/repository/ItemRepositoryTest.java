@@ -72,6 +72,39 @@ class ItemRepositoryTest {
     }
 
     @Test
+    @DisplayName("Deve distinguir perecíveis pelo tamanho/gênero além da validade")
+    void findByTypeAndItemNameAndSizeAndGenderAndExpirationAt() {
+        LocalDate expiration = LocalDate.of(2026, 12, 31);
+        createItem(ItemType.HIGIENE, "Fralda", "P", Gender.M, expiration, 5);
+        createItem(ItemType.HIGIENE, "Fralda", "G", Gender.M, expiration, 8);
+        em.flush();
+        em.clear();
+
+        Items result = itemRepository.findByTypeAndItemNameAndSizeAndGenderAndExpirationAt(
+                ItemType.HIGIENE, "Fralda", "P", Gender.M, expiration);
+
+        assertThat(result).isNotNull();
+        assertThat(result.getSize()).isEqualTo("P");
+        assertThat(result.getQuantity()).isEqualTo(5);
+    }
+
+    @Test
+    @DisplayName("Deve casar perecível com tamanho/gênero nulos por tipo, nome e validade")
+    void findByTypeAndItemNameAndSizeAndGenderAndExpirationAtCamposNulos() {
+        LocalDate expiration = LocalDate.of(2026, 12, 31);
+        createItem(ItemType.HIGIENE, "Pomada", null, null, expiration, 10);
+        em.flush();
+        em.clear();
+
+        Items result = itemRepository.findByTypeAndItemNameAndSizeAndGenderAndExpirationAt(
+                ItemType.HIGIENE, "Pomada", null, null, expiration);
+
+        assertThat(result).isNotNull();
+        assertThat(result.getItemName()).isEqualTo("Pomada");
+        assertThat(result.getQuantity()).isEqualTo(10);
+    }
+
+    @Test
     @DisplayName("Deve encontrar item por nome, tamanho e gênero para montagem de kit")
     void findByItemNameAndSizeAndGender() {
         createItem(ItemType.ROUPA, "Macacão", "M", Gender.F, null, 8);
@@ -106,10 +139,12 @@ class ItemRepositoryTest {
         LocalDate expiration = LocalDate.now().with(TemporalAdjusters.next(DayOfWeek.FRIDAY));
         createItem(ItemType.HIGIENE, "Pomada", null, null, expiration, 3);
         createItem(ItemType.HIGIENE, "Pomada", null, null, expiration, 7);
+        // Distrator: também sem gênero, mas com outro nome — não deve entrar no total
+        createItem(ItemType.ALIMENTACAO, "Leite", null, null, expiration, 99);
         em.flush();
         em.clear();
 
-        Integer total = itemRepository.getTotalForItemWithoutSizeAndGender("Pomada", null);
+        Integer total = itemRepository.getTotalForItemWithoutSizeAndGender("Pomada");
 
         assertThat(total).isEqualTo(10);
     }

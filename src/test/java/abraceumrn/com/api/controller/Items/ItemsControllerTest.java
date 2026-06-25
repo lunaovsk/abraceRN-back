@@ -4,7 +4,7 @@ import abraceumrn.com.api.domain.dto.ViewItems;
 import abraceumrn.com.api.domain.enumItem.Gender;
 import abraceumrn.com.api.domain.enumItem.ItemType;
 import abraceumrn.com.api.domain.items.ItemDTO;
-import abraceumrn.com.api.domain.items.ItemService;
+import abraceumrn.com.api.service.ItemService;
 import abraceumrn.com.api.infra.exception.CustomException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

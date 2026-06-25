@@ -6,7 +6,7 @@ import abraceumrn.com.api.domain.dto.ViewItems;
 import abraceumrn.com.api.domain.enumItem.Gender;
 import abraceumrn.com.api.domain.enumItem.ItemType;
 import abraceumrn.com.api.domain.items.ItemDTO;
-import abraceumrn.com.api.domain.items.ItemService;
+import abraceumrn.com.api.service.ItemService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;

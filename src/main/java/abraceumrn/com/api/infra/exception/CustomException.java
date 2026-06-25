@@ -1,9 +1,11 @@
 package abraceumrn.com.api.infra.exception;
 
+import java.nio.file.AccessDeniedException;
 import java.util.Collections;
 import java.util.Map;
 
 public class CustomException extends RuntimeException {
+
     private final String errorCode;
     private final Map<String, Object> details;
 
