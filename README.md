@@ -4,6 +4,8 @@ Sistema de gestão de estoque desenvolvido para a ONG **Abrace RN**, que
 auxilia mulheres em situação de vulnerabilidade no pós-parto, garantindo
 a distribuição organizada de itens essenciais para recém-nascidos.
 
+Este repositório contém a API e a lógica de negócios da aplicação. Para visualizar a interface de usuário e o código no lado cliente que consome esta API, acesse o repositório do [Frontend](https://github.com/lunaovsk/abraceRN-front).
+
 ## Sobre o Projeto
 
 Esta API fornece endpoints para gerenciar itens de doação (roupas,
