@@ -9,6 +9,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
+
 /**
  * Entidade que representa um usuário do sistema.
  *
@@ -30,18 +32,24 @@ public class UserData {
     private String password;
     @Enumerated(EnumType.STRING)
     private Role role;
+    private boolean isActive;
+    private LocalDateTime lastLogin;
+    private LocalDateTime expiresAt;
+    private String loginCode;
+    private LocalDateTime loginCodeExpiresAt;
 
     /**
      * Construtor que cria um usuário com credenciais e role.
      *
      * @param username nome de usuário ou email
      * @param password senha do usuário (deve ser criptografada antes de persistir)
-     * @param role role/permissão do usuário (USER ou ADMIN)
+     * @param role role/permissão do usuário, seguindo principio de menor privilégio.
      */
-    public UserData (String username, String password, Role role) {
+    public UserData (String username, String password) {
         this.username = username;
         this.password = password;
-        this.role = role;
+        this.role = Role.USER;
+        this.isActive = true;
     }
 
 }

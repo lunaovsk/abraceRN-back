@@ -28,9 +28,13 @@ import javax.crypto.spec.SecretKeySpec;
  * Configuração central de segurança da aplicação.
  *
  * Define:
+
  * - Política de sessão stateless (REST API com JWT)
+ *
  * - Regras de autorização por endpoint
+ *
  * - Codificação/decodificação de tokens JWT
+ *
  * - Estratégia de autenticação OAuth2 com JWT
  */
 @Configuration

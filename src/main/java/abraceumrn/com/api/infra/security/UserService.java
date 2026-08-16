@@ -66,7 +66,7 @@ public class UserService implements UserDetailsService {
         }
         String passwordEncoded = passwordEncoder.encode(dto.password());
         String emailLowerCase = dto.username().toLowerCase();
-        UserData data = new UserData(emailLowerCase, passwordEncoded, Role.USER);
+        UserData data = new UserData(emailLowerCase, passwordEncoded);
         return userRepository.save(data);
     }
 

@@ -56,7 +56,7 @@ class UserControllerTest {
     @WithMockUser
     @DisplayName("Deveria devolver 201 quando conta for criada com sucesso")
     void createCenarioSucesso() throws Exception {
-        var userData = new UserData("teste@email.com", "senha123", Role.USER);
+        var userData = new UserData("teste@email.com", "senha123");
         when(userService.createAccount(any())).thenReturn(userData);
 
         var response = mvc.perform(post("/login/create")
