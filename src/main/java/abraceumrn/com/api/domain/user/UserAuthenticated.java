@@ -10,7 +10,6 @@ import java.util.List;
 
 public class UserAuthenticated implements UserDetails {
 
-
     private final UserData userData;
 
     public UserAuthenticated(UserData userData) {
